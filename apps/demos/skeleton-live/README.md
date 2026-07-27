@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# 拉丁骨骼实时反馈(skeleton-live)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+浏览器端的拉丁舞骨骼可视化 + Just Dance 式跟练打分 demo。
+Vite + React + TypeScript + MediaPipe Pose Landmarker(33 关键点,**只保留身体 11–32 号点,不做面部识别/显示**)。
 
-Currently, two official plugins are available:
+之后用作 OBS 浏览器源:直播模式下纯绿幕 + 骨骼线条,色度键抠像后叠加到摄像头画面。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 运行
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev     # 开发
+npm run build   # 生产构建(tsc -b && vite build)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+摄像头功能需要 **localhost 或 https** 环境。模型与 wasm 均已本地化:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `public/wasm/` — MediaPipe vision wasm 运行时
+- `public/models/pose_landmarker_lite.task`(5.8 MB,默认,省性能)
+- `public/models/pose_landmarker_full.task`(9.4 MB,更准)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+本地模型缺失时自动回退到 MediaPipe 官方 CDN(界面会标注「CDN 模型」)。
+
+## 功能列表
+
+- 摄像头镜像画面 + 暗色蒙版 + 骨骼连线/关键点(只画身体,无面部)
+- 输入源:摄像头(640×480 / 1280×720)或上传本地视频循环播放
+- 模型切换:lite / full;GPU delegate 优先,失败自动回退 CPU
+- 实时 FPS + 模型 / delegate 状态角标
+- 直播模式:纯 `#00ff00` 绿幕,只渲染骨骼,Esc 退出(供 OBS 色度抠像)
+- **跟练打分 v0**:参考动作录制/导入 + 实时相似度评分 + 分部位染色反馈
+
+## 跟练打分用法
+
+1. **准备参考动作**(三选一):
+   - 「上传参考视频」:选一段老师示范视频,系统逐帧提取身体姿态序列(有进度条,可取消)
+   - 「录 10s / 20s / 30s」:摄像头倒计时 3 秒后录制 N 秒,把实时姿态存为参考序列
+   - 「导入 JSON」:复用之前导出的参考序列
+2. 参考序列可「导出 JSON」存档/分享。
+3. 点「开始跟练」,3 秒倒计时后参考序列按时间轴播放(白色幽灵骨架),跟着跳:
+   - 顶部大数字 = 当前帧相似度(0–100),下方是全程平均分和进度条
+   - 部位偏差染色:青绿 <15°,黄 15–30°,红 >30°(左臂/右臂/左腿/右腿/躯干)
+   - 全身没入镜时提示「未识别到完整身体」,该帧不计分
+4. 时间轴走完显示最终平均分,可「再来一次」。
+
+## 打分算法说明(v0)
+
+- **特征**:只用身体关键点,计算 9 维关节角度特征(弧度)——左肩、右肩、左肘、右肘、左髋、右髋、左膝、右膝的向量夹角 + 躯干倾斜角(双肩中点相对双髋中点的有向倾角)。不用原始坐标直接比,避免身高/站位差异失真。
+- **归一化**:以双髋中点为原点、肩宽为单位长度(肩宽退化时用躯干长),消除身高和远近影响。参考序列存的就是归一化后的 22 个身体点。
+- **左右一致性**:镜像只是显示层变换;参考与实时两侧都按未镜像的解剖学左右计算角度,反射不改变角度值,所以左右不会颠倒。
+- **单帧得分**:每个特征的角度差 `d` 映射为 `max(0, 100 × (1 − d/90°))`,9 维等权平均得 0–100 分;全程平均分为累计均值。
+- **部位偏差**:左臂=左肩+左肘,右臂=右肩+右肘,左腿=左髋+左膝,右腿=右髋+右膝,躯干=躯干倾斜角,各取平均角度差(度)映射到染色阈值。
+- **时间对齐**:v0 为「同步跟练」——参考序列按时间轴走,比当前时刻的帧,不做 DTW。v1 计划录完回放整段做 DTW 对齐。
+- **低置信度**:任一打分所需关键点(肩/肘/腕/髋/膝/踝)visibility < 0.5 的帧跳过不计分,并给出 UI 提示。
+
+## 手机使用
+
+- 布局已响应式:手机上画布全屏,控制面板变为底部可收起抽屉,按钮为触屏尺寸。
+- **注意**:手机浏览器要求 **https** 才能开摄像头。本地局域网 IP(如 `http://192.168.x.x:5173`)会被浏览器拦截 `getUserMedia`。
+- 正确姿势:`npm run build` 后部署到支持 https 的平台(如 Vercel / Netlify),用手机浏览器打开 https 链接即可。模型文件较大(full 9.4 MB),首次加载建议用 lite。
+
+## 已知限制
+
+- 参考视频提取是实时的(视频多长提多久),过长视频请自行裁剪。
+- v0 同步跟练对节奏错位敏感:跳慢了分数会掉,因为比的是"当前时刻"的参考帧。
+- 2D 图像平面角度对朝向摄像机的旋转(前后转身)不敏感,z 轴深度未参与特征。
+- 跟练打分会染色骨架;直播模式下同样生效,可作为 OBS 上的实时反馈。
