@@ -15,11 +15,20 @@ import {
   type BodyPart,
 } from '../lib/bodyPose'
 import {
+  PoseSmoother,
+  SMOOTH_LABELS,
+  SMOOTH_LEVELS,
+  SMOOTH_PRESETS,
+  type SmoothLevel,
+} from '../lib/oneEuroFilter'
+import { extractKeyPoses, type KeyPose } from '../lib/keyPoses'
+import {
   parseSequence,
   sequenceToJson,
   type ReferenceSample,
   type ReferenceSequence,
 } from '../lib/reference'
+import KeyPoseCard from './KeyPoseCard'
 
 type SourceType = 'camera' | 'video'
 type Resolution = '480p' | '720p'
@@ -37,6 +46,10 @@ const POINT_COLOR = '#ff5c8a'
 const GHOST_COLOR = 'rgba(255, 255, 255, 0.35)'
 const GREEN_SCREEN = '#00ff00'
 const COUNTDOWN_SECONDS = 3
+/** 界面帧分滑动平均窗口(秒) */
+const SCORE_WINDOW_SEC = 0.5
+/** 关键动作得分的统计窗口(秒,围绕关键时刻) */
+const KEY_SCORE_RADIUS = 0.3
 
 const ALL_PARTS: BodyPart[] = ['leftArm', 'rightArm', 'leftLeg', 'rightLeg', 'torso']
 
@@ -50,6 +63,12 @@ function neutralPartColors(): Record<BodyPart, string> {
   }
 }
 
+interface ScoreSample {
+  t: number
+  score: number
+  partErr: Record<BodyPart, number>
+}
+
 interface FollowRun {
   startPerf: number
   duration: number
@@ -59,6 +78,9 @@ interface FollowRun {
   frame: number | null
   lowVis: boolean
   progress: number
+  t: number
+  window: ScoreSample[]
+  keyScores: Array<{ sum: number; count: number }>
 }
 
 interface RecordRun {
@@ -72,6 +94,16 @@ interface Countdown {
   label: string
   action: () => void
 }
+
+interface HudState {
+  frame: number | null
+  avg: number
+  progress: number
+  lowVis: boolean
+  nextKey: { idx: number; remain: number } | null
+}
+
+const HUD_IDLE: HudState = { frame: null, avg: 0, progress: 0, lowVis: false, nextKey: null }
 
 function cameraErrorMessage(err: unknown): string {
   const name = err instanceof DOMException ? err.name : ''
@@ -90,6 +122,10 @@ function scoreColor(score: number): string {
   return '#ef4444'
 }
 
+function fmtTime(t: number): string {
+  return `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`
+}
+
 export default function SkeletonLive() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const refVideoRef = useRef<HTMLVideoElement>(null)
@@ -106,6 +142,9 @@ export default function SkeletonLive() {
   const partColorsRef = useRef<Record<BodyPart, string>>(neutralPartColors())
   const lastHudRef = useRef(0)
   const cancelExtractRef = useRef(false)
+  const smootherRef = useRef(new PoseSmoother(SMOOTH_PRESETS.medium))
+  const smoothLevelRef = useRef<SmoothLevel>('medium')
+  const keyPosesRef = useRef<KeyPose[]>([])
 
   const [modelType, setModelType] = useState<ModelType>('lite')
   const [resolution, setResolution] = useState<Resolution>('480p')
@@ -114,6 +153,7 @@ export default function SkeletonLive() {
   const [fileName, setFileName] = useState('')
   const [liveMode, setLiveMode] = useState(false)
   const [panelOpen, setPanelOpen] = useState(true)
+  const [smoothLevel, setSmoothLevel] = useState<SmoothLevel>('medium')
 
   const [fps, setFps] = useState(0)
   const [modelStatus, setModelStatus] = useState<'loading' | 'ready' | 'error'>('loading')
@@ -127,15 +167,12 @@ export default function SkeletonLive() {
   const [refName, setRefName] = useState('')
   const [refError, setRefError] = useState<string | null>(null)
   const [extractProgress, setExtractProgress] = useState<number | null>(null)
+  const [keyPoses, setKeyPoses] = useState<KeyPose[]>([])
   const [followState, setFollowState] = useState<FollowState>('idle')
   const [recordState, setRecordState] = useState<RecordState>('idle')
   const [finalScore, setFinalScore] = useState(0)
-  const [hud, setHud] = useState<{ frame: number | null; avg: number; progress: number; lowVis: boolean }>({
-    frame: null,
-    avg: 0,
-    progress: 0,
-    lowVis: false,
-  })
+  const [keyResults, setKeyResults] = useState<Array<{ t: number; avg: number }> | null>(null)
+  const [hud, setHud] = useState<HudState>(HUD_IDLE)
 
   useEffect(() => {
     liveModeRef.current = liveMode
@@ -144,6 +181,20 @@ export default function SkeletonLive() {
   useEffect(() => {
     refSeqRef.current = refSeq
   }, [refSeq])
+
+  useEffect(() => {
+    keyPosesRef.current = keyPoses
+  }, [keyPoses])
+
+  // 平滑档位切换
+  useEffect(() => {
+    smoothLevelRef.current = smoothLevel
+    if (smoothLevel === 'off') {
+      smootherRef.current.reset()
+    } else {
+      smootherRef.current.setParams(SMOOTH_PRESETS[smoothLevel])
+    }
+  }, [smoothLevel])
 
   // Esc 退出直播模式
   useEffect(() => {
@@ -159,6 +210,7 @@ export default function SkeletonLive() {
     let cancelled = false
     setModelStatus('loading')
     setModelError(null)
+    smootherRef.current.reset()
     loadPoseLandmarker(modelType)
       .then(({ landmarker, delegate, modelSource: ms }) => {
         if (cancelled) {
@@ -189,6 +241,7 @@ export default function SkeletonLive() {
     let stream: MediaStream | null = null
     const video = videoRef.current
     if (!video) return
+    smootherRef.current.reset()
 
     if (source === 'camera') {
       setCameraError(null)
@@ -237,9 +290,11 @@ export default function SkeletonLive() {
     countdownRef.current = null
     partColorsRef.current = neutralPartColors()
     setFollowState('idle')
+    setKeyResults(null)
     setRefSeq(seq)
     setRefName(name)
     setRefError(null)
+    setKeyPoses(extractKeyPoses(seq))
   }
 
   const extractFromVideoFile = async (file: File) => {
@@ -252,6 +307,10 @@ export default function SkeletonLive() {
     cancelExtractRef.current = false
     setRefError(null)
     setExtractProgress(0)
+
+    // 提取时就用当前档位的滤波器,存进序列的就是平滑后的数据
+    const extractSmoother =
+      smoothLevelRef.current === 'off' ? null : new PoseSmoother(SMOOTH_PRESETS[smoothLevelRef.current])
 
     const url = URL.createObjectURL(file)
     v.src = url
@@ -284,6 +343,9 @@ export default function SkeletonLive() {
             const res = landmarker.detectForVideo(v, performance.now())
             const lm = res.landmarks?.[0]
             const ok = !!lm && bodyVisible(lm)
+            if (ok && extractSmoother) {
+              extractSmoother.filterLandmarks(lm, v.currentTime)
+            }
             samples.push({ t: v.currentTime, ok, body: ok ? toBodyPose(lm) : emptyBodyPose() })
           } catch {
             // 单帧失败跳过
@@ -345,6 +407,8 @@ export default function SkeletonLive() {
     setRefSeq(null)
     setRefName('')
     setRefError(null)
+    setKeyPoses([])
+    setKeyResults(null)
   }
 
   // ---------- 录制 / 跟练 ----------
@@ -366,6 +430,8 @@ export default function SkeletonLive() {
     if (!refSeqRef.current || recordState !== 'idle') return
     followRunRef.current = null
     partColorsRef.current = neutralPartColors()
+    setKeyResults(null)
+    setPanelOpen(false)
     countdownRef.current = {
       endPerf: performance.now() + COUNTDOWN_SECONDS * 1000,
       label: '准备跟练',
@@ -381,6 +447,9 @@ export default function SkeletonLive() {
           frame: null,
           lowVis: false,
           progress: 0,
+          t: 0,
+          window: [],
+          keyScores: keyPosesRef.current.map(() => ({ sum: 0, count: 0 })),
         }
         setFollowState('running')
       },
@@ -393,7 +462,8 @@ export default function SkeletonLive() {
     countdownRef.current = null
     partColorsRef.current = neutralPartColors()
     setFollowState('idle')
-    setHud({ frame: null, avg: 0, progress: 0, lowVis: false })
+    setKeyResults(null)
+    setHud(HUD_IDLE)
   }
 
   // ---------- 渲染 + 推理主循环 ----------
@@ -418,7 +488,7 @@ export default function SkeletonLive() {
         const h = canvas.height
         const live = liveModeRef.current
 
-        // 同一帧不重复推理
+        // 同一帧不重复推理;推理后立即做 One Euro 平滑
         let didInfer = false
         const landmarker = landmarkerRef.current
         if (landmarker && video.currentTime !== lastVideoTimeRef.current) {
@@ -426,6 +496,10 @@ export default function SkeletonLive() {
           try {
             lastResultsRef.current = landmarker.detectForVideo(video, now)
             inferCountRef.current += 1
+            const lm0 = lastResultsRef.current.landmarks?.[0]
+            if (lm0 && smoothLevelRef.current !== 'off') {
+              smootherRef.current.filterLandmarks(lm0, now / 1000)
+            }
             didInfer = true
           } catch {
             // 单帧推理失败时沿用上一帧结果
@@ -433,7 +507,7 @@ export default function SkeletonLive() {
         }
         const landmarks = lastResultsRef.current?.landmarks?.[0]
 
-        // ---- 录制参考(摄像头) ----
+        // ---- 录制参考(摄像头,滤波后的坐标) ----
         const rec = recordRunRef.current
         if (rec && didInfer) {
           const t = (now - rec.startPerf) / 1000
@@ -469,12 +543,20 @@ export default function SkeletonLive() {
         const fr = followRunRef.current
         if (fr && seq) {
           const t = (now - fr.startPerf) / 1000
+          fr.t = t
           fr.progress = Math.min(1, t / fr.duration)
           if (t >= fr.duration) {
             const finalAvg = fr.count > 0 ? fr.sum / fr.count : 0
+            const keys = keyPosesRef.current
+            const results: Array<{ t: number; avg: number }> = []
+            for (let ki = 0; ki < keys.length; ki++) {
+              const ks = fr.keyScores[ki]
+              if (ks && ks.count > 0) results.push({ t: keys[ki].t, avg: ks.sum / ks.count })
+            }
             followRunRef.current = null
             partColorsRef.current = neutralPartColors()
             setFinalScore(finalAvg)
+            setKeyResults(results)
             setFollowState('finished')
           } else {
             while (fr.sampleIdx + 1 < seq.samples.length && seq.samples[fr.sampleIdx + 1].t <= t) {
@@ -482,14 +564,33 @@ export default function SkeletonLive() {
             }
             const sample = seq.samples[fr.sampleIdx]
             if (landmarks && bodyVisible(landmarks) && sample.ok) {
+              // 打分特征来自滤波后的坐标
               const fs = scoreFrame(featuresFromLandmarks(landmarks), featuresFromBody(sample.body))
               fr.sum += fs.score
               fr.count += 1
-              fr.frame = fs.score
               fr.lowVis = false
+
+              // 0.5s 滑动平均:显示分 + 部位染色都走窗口均值,避免狂跳
+              fr.window.push({ t, score: fs.score, partErr: fs.partErrDeg })
+              const cutoff = t - SCORE_WINDOW_SEC
+              while (fr.window.length > 0 && fr.window[0].t < cutoff) fr.window.shift()
+              const n = fr.window.length
+              fr.frame = fr.window.reduce((s, x) => s + x.score, 0) / n
               const colors = neutralPartColors()
-              for (const part of ALL_PARTS) colors[part] = partColor(fs.partErrDeg[part])
+              for (const part of ALL_PARTS) {
+                const avgErr = fr.window.reduce((s, x) => s + x.partErr[part], 0) / n
+                colors[part] = partColor(avgErr)
+              }
               partColorsRef.current = colors
+
+              // 关键动作得分统计(关键时刻 ±0.3s)
+              const keys = keyPosesRef.current
+              for (let ki = 0; ki < keys.length; ki++) {
+                if (Math.abs(keys[ki].t - t) <= KEY_SCORE_RADIUS) {
+                  fr.keyScores[ki].sum += fs.score
+                  fr.keyScores[ki].count += 1
+                }
+              }
             } else {
               fr.frame = null
               fr.lowVis = !landmarks || !bodyVisible(landmarks)
@@ -621,11 +722,20 @@ export default function SkeletonLive() {
           lastHudRef.current = now
           const frNow = followRunRef.current
           if (frNow) {
+            const keys = keyPosesRef.current
+            let nextKey: { idx: number; remain: number } | null = null
+            for (let ki = 0; ki < keys.length; ki++) {
+              if (keys[ki].t > frNow.t + 0.05) {
+                nextKey = { idx: ki, remain: keys[ki].t - frNow.t }
+                break
+              }
+            }
             setHud({
               frame: frNow.frame,
               avg: frNow.count > 0 ? frNow.sum / frNow.count : 0,
               progress: frNow.progress,
               lowVis: frNow.lowVis,
+              nextKey,
             })
           }
         }
@@ -669,6 +779,20 @@ export default function SkeletonLive() {
   const panelBtn = 'flex-1 rounded-md bg-neutral-800 px-2 py-2 text-xs text-neutral-300 hover:bg-neutral-700 disabled:opacity-40'
   const panelBtnActive = 'flex-1 rounded-md bg-emerald-500 px-2 py-2 text-xs font-medium text-black'
 
+  const nextKeySample =
+    followState === 'running' && hud.nextKey && refSeq && keyPoses[hud.nextKey.idx]
+      ? refSeq.samples[keyPoses[hud.nextKey.idx].index]
+      : null
+
+  const bestKeys = keyResults ? [...keyResults].sort((a, b) => b.avg - a.avg).slice(0, 3) : []
+  const worstKeys = keyResults
+    ? [...keyResults]
+        .filter((r) => !bestKeys.includes(r))
+        .sort((a, b) => a.avg - b.avg)
+        .slice(0, 3)
+    : []
+  const worstShown = worstKeys.length > 0 ? worstKeys : [...bestKeys].reverse()
+
   return (
     <div
       className="fixed inset-0 overflow-hidden select-none"
@@ -709,9 +833,6 @@ export default function SkeletonLive() {
           <div className="mt-1 text-xs text-neutral-300">
             平均分 {Math.round(hud.avg)} · 进度 {Math.round(hud.progress * 100)}%
           </div>
-          <div className="mt-1 h-1 w-40 overflow-hidden rounded-full bg-neutral-800">
-            <div className="h-full bg-emerald-400" style={{ width: `${hud.progress * 100}%` }} />
-          </div>
           {hud.lowVis && (
             <div className="mt-1.5 rounded bg-amber-500/20 px-2 py-0.5 text-xs text-amber-300">
               未识别到完整身体,本帧不计分
@@ -720,14 +841,66 @@ export default function SkeletonLive() {
         </div>
       )}
 
+      {/* 「下一个动作」预告卡(右侧中部,不挡人) */}
+      {!liveMode && nextKeySample && nextKeySample.ok && hud.nextKey && (
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 sm:right-4">
+          <KeyPoseCard body={nextKeySample.body} remain={hud.nextKey.remain} />
+        </div>
+      )}
+
+      {/* 底部进度时间轴:关键动作标记 + 播放头 */}
+      {!liveMode && followActive && refSeq && refSeq.duration > 0 && (
+        <div className="pointer-events-none absolute inset-x-4 bottom-3 sm:inset-x-24">
+          <div className="relative h-1.5 rounded-full bg-neutral-800/80">
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-emerald-400/70"
+              style={{ width: `${hud.progress * 100}%` }}
+            />
+            {keyPoses.map((k, i) => (
+              <div
+                key={i}
+                className="absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] bg-white/80"
+                style={{ left: `${(k.t / refSeq.duration) * 100}%` }}
+              />
+            ))}
+            <div
+              className="absolute top-1/2 h-3.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded bg-emerald-300"
+              style={{ left: `${hud.progress * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* 跟练结束结算 */}
       {!liveMode && followState === 'finished' && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-          <div className="w-72 rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-center">
+          <div className="max-h-[85vh] w-80 overflow-y-auto rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-center">
             <p className="text-xs text-neutral-500">跟练完成,全程平均分</p>
             <p className="my-2 text-5xl font-bold tabular-nums" style={{ color: scoreColor(finalScore) }}>
               {Math.round(finalScore)}
             </p>
+            {keyResults && keyResults.length > 0 && (
+              <div className="mt-3 space-y-2 text-left text-xs">
+                <div className="rounded-md bg-neutral-800/60 p-2.5">
+                  <p className="mb-1 font-medium text-emerald-300">做得最好的关键动作</p>
+                  {bestKeys.map((r) => (
+                    <p key={`b${r.t}`} className="flex justify-between text-neutral-300">
+                      <span>{fmtTime(r.t)}</span>
+                      <span className="tabular-nums">{Math.round(r.avg)} 分</span>
+                    </p>
+                  ))}
+                </div>
+                <div className="rounded-md bg-neutral-800/60 p-2.5">
+                  <p className="mb-1 font-medium text-red-300">最需要练的关键动作</p>
+                  {worstShown.map((r) => (
+                    <p key={`w${r.t}`} className="flex justify-between text-neutral-300">
+                      <span>{fmtTime(r.t)}</span>
+                      <span className="tabular-nums">{Math.round(r.avg)} 分</span>
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="mt-4 flex gap-2">
               <button onClick={startFollow} className={panelBtnActive}>
                 再来一次
@@ -791,6 +964,21 @@ export default function SkeletonLive() {
               </div>
 
               <div>
+                <p className="mb-1.5 text-xs text-neutral-500">平滑强度(治抖动)</p>
+                <div className="flex gap-2">
+                  {SMOOTH_LEVELS.map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => setSmoothLevel(l)}
+                      className={smoothLevel === l ? panelBtnActive : panelBtn}
+                    >
+                      {SMOOTH_LABELS[l]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
                 <p className="mb-1.5 text-xs text-neutral-500">摄像头分辨率</p>
                 <div className="flex gap-2">
                   {(Object.keys(RESOLUTIONS) as Resolution[]).map((r) => (
@@ -847,7 +1035,8 @@ export default function SkeletonLive() {
                   </div>
                 ) : refSeq ? (
                   <div className="mb-2 rounded-md bg-neutral-900 px-2 py-1.5 text-xs text-neutral-300">
-                    {refName} · {refSeq.duration.toFixed(1)}s · {refSeq.samples.length} 帧
+                    {refName} · {refSeq.duration.toFixed(1)}s · {refSeq.samples.length} 帧 · 关键动作{' '}
+                    {keyPoses.length} 个
                   </div>
                 ) : (
                   <p className="mb-2 text-xs text-neutral-600">先录制 / 导入一个参考动作。</p>
@@ -933,7 +1122,7 @@ export default function SkeletonLive() {
                   </button>
                 )}
                 <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">
-                  骨架颜色 = 部位偏差:青绿 &lt;15°,黄 15–30°,红 &gt;30°;白色幽灵是参考动作。
+                  骨架颜色 = 部位偏差:青绿 &lt;15°,黄 15–30°,红 &gt;30°;白色幽灵是参考动作,右侧卡片预告下一个关键动作。
                 </p>
               </div>
 
