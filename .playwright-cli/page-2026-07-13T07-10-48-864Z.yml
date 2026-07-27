@@ -1,0 +1,449 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: 舞
+        - generic [ref=e6]: 拉丁练习入口
+        - generic [ref=e7]: PRACTICE LOG · SINCE 2026
+      - navigation [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e10]: Live
+          - link "今日总览" [ref=e11] [cursor=pointer]:
+            - /url: /
+          - link "旧站 Proof" [ref=e13] [cursor=pointer]:
+            - /url: /legacy/
+        - generic [ref=e15]:
+          - generic [ref=e16]: Library
+          - link "Daily Latin" [ref=e17] [cursor=pointer]:
+            - /url: /daily-latin/
+          - link "Dance OS" [ref=e19] [cursor=pointer]:
+            - /url: /dance-os/
+        - generic [ref=e21]:
+          - generic [ref=e22]: Tools
+          - link "来源与规则" [ref=e23] [cursor=pointer]:
+            - /url: /tools/
+        - generic [ref=e25]:
+          - generic [ref=e26]: Plan
+          - link "路线图" [ref=e27] [cursor=pointer]:
+            - /url: /roadmap/
+          - link "状态看板" [ref=e29] [cursor=pointer]:
+            - /url: /dashboard/
+        - generic [ref=e31]:
+          - generic [ref=e32]: About
+          - link "关于这条线" [ref=e33] [cursor=pointer]:
+            - /url: /about/
+      - generic [ref=e35]:
+        - generic [ref=e36]: TODAY READY · 8 ROUTES
+        - text: 先看旧站 / 再进 Daily / 或去 Dance OS
+    - main [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e43]: Dance OS
+            - heading "从练习过程里长出工具，不从空白产品名开始" [level=1] [ref=e44]
+          - generic [ref=e45]: route · /dance-os
+        - generic [ref=e46]:
+          - link "总览" [ref=e47] [cursor=pointer]:
+            - /url: "#dance-summary"
+          - link "独立 Demo" [ref=e48] [cursor=pointer]:
+            - /url: "#independent-demo-entry"
+          - link "去向" [ref=e49] [cursor=pointer]:
+            - /url: "#dance-next-bridge"
+          - link "模块库" [ref=e50] [cursor=pointer]:
+            - /url: "#dance-assets"
+          - link "纠错" [ref=e51] [cursor=pointer]:
+            - /url: "#correction-ledger-demo"
+          - link "队列" [ref=e52] [cursor=pointer]:
+            - /url: "#body-map-practice-queue"
+          - link "依据" [ref=e53] [cursor=pointer]:
+            - /url: "#dance-sources"
+        - paragraph [ref=e54]: 这页先不追求工具名，只先把录一轮、回看、只修一个点、下次还能回来继续这条链收成真的练习入口。
+        - generic [ref=e56]:
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - generic [ref=e60]: CORRECTION SNAPSHOT
+              - heading "录 / 看 / 记 / 下一轮" [level=4] [ref=e61]
+            - generic [ref=e62]:
+              - generic [ref=e63]:
+                - generic [ref=e64]: 状态
+                - strong [ref=e65]: "4"
+              - generic [ref=e66]:
+                - generic [ref=e67]: 身体落点
+                - strong [ref=e68]: "4"
+              - generic [ref=e69]:
+                - generic [ref=e70]: 最小 witness
+                - strong [ref=e71]: 15s
+              - generic [ref=e72]:
+                - generic [ref=e73]: 下一轮队列
+                - strong [ref=e74]: "1"
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - strong [ref=e77]: 先看见
+                - paragraph [ref=e78]: 先录 15 秒，看见问题。
+              - generic [ref=e79]:
+                - strong [ref=e80]: 再压成一句
+                - paragraph [ref=e81]: 把问题写成下轮先改哪的一句动作句。
+              - generic [ref=e82]:
+                - strong [ref=e83]: 再看会不会回来
+                - paragraph [ref=e84]: 做完后还说不出下次先改哪，这层就还没成立。
+          - generic [ref=e85]:
+            - heading "Dance OS Demo" [level=3] [ref=e86]
+            - generic [ref=e87]: session lens · correction ledger · body map · practice queue
+            - generic [ref=e88]:
+              - generic [ref=e89]: 定位
+              - generic [ref=e90]: 先把练完后怎么继续做成入口。
+              - generic [ref=e91]: 最小动作
+              - generic [ref=e92]: 录 15 秒 / 只修 1 点 / 留下下一轮。
+              - generic [ref=e93]: 当前验证
+              - generic [ref=e94]: correction / body map / queue 先跑成闭环。
+              - generic [ref=e95]: 最大风险
+              - generic [ref=e96]: 模块越来越多，但做完仍不知道先改哪。
+            - generic [ref=e97]:
+              - generic [ref=e98]: Body Map
+              - generic [ref=e99]: Correction Ledger
+              - generic [ref=e100]: Next Step
+        - generic [ref=e102]:
+          - generic [ref=e104]:
+            - generic [ref=e105]:
+              - generic [ref=e106]: INDEPENDENT DEMO ENTRY
+              - heading "frontdoor 先承接，再把独立工具壳单独长" [level=4] [ref=e107]
+            - generic [ref=e108]:
+              - generic [ref=e109]:
+                - generic [ref=e110]: 入口
+                - strong [ref=e111]: "2"
+              - generic [ref=e112]:
+                - generic [ref=e113]: 形态
+                - strong [ref=e114]: local
+              - generic [ref=e115]:
+                - generic [ref=e116]: 已验证
+                - strong [ref=e117]: "3"
+              - generic [ref=e118]:
+                - generic [ref=e119]: 主链
+                - strong [ref=e120]: return
+            - generic [ref=e121]:
+              - generic [ref=e122]:
+                - strong [ref=e123]: 先从 frontdoor 看边界
+                - paragraph [ref=e124]: 本页先告诉你这个工具在整个系统里负责什么，不把入口和产品壳混在一起。
+              - generic [ref=e125]:
+                - strong [ref=e126]: 再进独立壳
+                - paragraph [ref=e127]: 独立 demo 现在已经不只是解释壳，而是能真实跑通 archive / queue / return trigger。
+              - generic [ref=e128]:
+                - strong [ref=e129]: 最后再决定是否回来 route
+                - paragraph [ref=e130]: 需要继续看 correction / body map 时，再回到这页的对照结构，不直接绑生产域名。
+          - generic [ref=e131]:
+            - heading "独立 Dance OS Demo 入口" [level=3] [ref=e132]
+            - generic [ref=e133]: frontdoor bridge · local shell · correction / queue / return proof
+            - generic [ref=e134]:
+              - generic [ref=e135]: 当前承接
+              - generic [ref=e136]: frontdoor 先解释边界，独立 demo 继续长产品链。
+              - generic [ref=e137]: 已成立链路
+              - generic [ref=e138]: archive -> queue -> return trigger
+              - generic [ref=e139]: 当前入口
+              - generic [ref=e140]: 本机 3301 独立壳 + 本页 correction / queue 对照入口
+              - generic [ref=e141]: 当前约束
+              - generic [ref=e142]: 先本地 / preview，不直接切旧域名首页。
+            - generic [ref=e143]:
+              - generic [ref=e144]: Local Shell
+              - generic [ref=e145]: Queue
+              - generic [ref=e146]: Return Trigger
+            - generic [ref=e147]:
+              - link "打开独立 Demo（本机 3301）" [ref=e148] [cursor=pointer]:
+                - /url: http://127.0.0.1:3301
+              - link "继续看本页 route demo" [ref=e149] [cursor=pointer]:
+                - /url: "#correction-ledger-demo"
+        - generic [ref=e150]:
+          - generic [ref=e151]:
+            - heading "从这里怎么继续" [level=2] [ref=e152]
+            - generic [ref=e153]: 继续 route demo / 进入独立壳 / 还没说清卡点就先回 Daily
+          - generic [ref=e154]:
+            - link "NEXT 01 ↗ 继续本页 route demo 已经知道这轮要修哪一层，但还没把 next step 压出来 下一步 继续 correction ledger，再把问题写成下轮动作句 先把这轮压成一句可执行 next step，不急着跳到别的壳。" [ref=e155] [cursor=pointer]:
+              - /url: /dance-os/#correction-ledger-demo
+              - generic [ref=e156]:
+                - generic [ref=e157]: NEXT 01
+                - generic [ref=e158]: ↗
+              - heading "继续本页 route demo" [level=3] [ref=e159]
+              - generic [ref=e160]: 已经知道这轮要修哪一层，但还没把 next step 压出来
+              - generic [ref=e161]:
+                - generic [ref=e162]: 下一步
+                - generic [ref=e163]: 继续 correction ledger，再把问题写成下轮动作句
+              - generic [ref=e164]: 先把这轮压成一句可执行 next step，不急着跳到别的壳。
+            - link "NEXT 02 ↗ 进入独立 Dance OS Demo 想直接看当前独立壳和 return 链怎么单独成立 下一步 先看入口关系，再决定是否打开本机 3301 独立壳 独立 demo 已经存在，但仍先由 frontdoor 把边界和入口讲清楚。" [ref=e165] [cursor=pointer]:
+              - /url: /dance-os/#independent-demo-entry
+              - generic [ref=e166]:
+                - generic [ref=e167]: NEXT 02
+                - generic [ref=e168]: ↗
+              - heading "进入独立 Dance OS Demo" [level=3] [ref=e169]
+              - generic [ref=e170]: 想直接看当前独立壳和 return 链怎么单独成立
+              - generic [ref=e171]:
+                - generic [ref=e172]: 下一步
+                - generic [ref=e173]: 先看入口关系，再决定是否打开本机 3301 独立壳
+              - generic [ref=e174]: 独立 demo 已经存在，但仍先由 frontdoor 把边界和入口讲清楚。
+            - link "NEXT 03 ↗ 还没说清卡点，先回 Daily 其实还停在重启 / 直播回流，还没到身体纠错层 下一步 先回 Daily 把这一轮接上，再决定是否桥接到 Dance OS 如果还不能说清是重心、髋、脚下还是上身，就别勉强留在 OS 层。" [ref=e175] [cursor=pointer]:
+              - /url: /daily-latin/?state=restart&dance=cha#today-loop-demo
+              - generic [ref=e176]:
+                - generic [ref=e177]: NEXT 03
+                - generic [ref=e178]: ↗
+              - heading "还没说清卡点，先回 Daily" [level=3] [ref=e179]
+              - generic [ref=e180]: 其实还停在重启 / 直播回流，还没到身体纠错层
+              - generic [ref=e181]:
+                - generic [ref=e182]: 下一步
+                - generic [ref=e183]: 先回 Daily 把这一轮接上，再决定是否桥接到 Dance OS
+              - generic [ref=e184]: 如果还不能说清是重心、髋、脚下还是上身，就别勉强留在 OS 层。
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - heading "Dance OS 模块库" [level=2] [ref=e187]
+            - generic [ref=e188]: 先选当前最需要的一组
+          - tablist "Dance OS asset groups" [ref=e189]:
+            - tab "产品模块" [selected] [ref=e190] [cursor=pointer]
+            - tab "来源文档" [ref=e191] [cursor=pointer]
+            - tab "现有页面" [ref=e192] [cursor=pointer]
+            - tab "未来工具" [ref=e193] [cursor=pointer]
+          - generic [ref=e194]:
+            - generic [ref=e195]:
+              - generic [ref=e196]:
+                - generic [ref=e197]: DANCE OS ASSET LIBRARY
+                - heading "产品模块" [level=3] [ref=e198]
+              - generic [ref=e199]: 06 ITEMS
+            - paragraph [ref=e200]: 不是空卡片，而是后续持续长出的真实工具壳
+          - generic [ref=e201]:
+            - generic [ref=e202]:
+              - generic [ref=e203]:
+                - generic [ref=e204]: DEMO
+                - generic [ref=e205]: feedback lens
+              - generic [ref=e206]:
+                - generic [ref=e207]: Session Lens
+                - generic [ref=e208]: 15 秒回看，只决定这轮先改哪。
+                - generic [ref=e209]: 先看见问题
+            - generic [ref=e210]:
+              - generic [ref=e211]:
+                - generic [ref=e212]: DEMO
+                - generic [ref=e213]: next-action log
+              - generic [ref=e214]:
+                - generic [ref=e215]: Correction Ledger
+                - generic [ref=e216]: 把问题写成下轮还会执行的动作句。
+                - generic [ref=e217]: 问题写成动作
+            - generic [ref=e218]:
+              - generic [ref=e219]:
+                - generic [ref=e220]: DEMO
+                - generic [ref=e221]: issue location
+              - generic [ref=e222]:
+                - generic [ref=e223]: Body Map
+                - generic [ref=e224]: 把卡点落到重心、髋、上身或脚下。
+                - generic [ref=e225]: 问题别悬空
+            - generic [ref=e226]:
+              - generic [ref=e227]:
+                - generic [ref=e228]: DEMO
+                - generic [ref=e229]: one next step
+              - generic [ref=e230]:
+                - generic [ref=e231]: Practice Queue
+                - generic [ref=e232]: 今天只留 1 个下次回来继续改的点。
+                - generic [ref=e233]: 下一轮继续改
+            - generic [ref=e234]:
+              - generic [ref=e235]:
+                - generic [ref=e236]: DEMO
+                - generic [ref=e237]: content witness
+              - generic [ref=e238]:
+                - generic [ref=e239]: Witness Archive
+                - generic [ref=e240]: 把练习过程沉成可回看的证据。
+                - generic [ref=e241]: 练习变资产
+            - generic [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]: DEMO
+                - generic [ref=e245]: retention test
+              - generic [ref=e246]:
+                - generic [ref=e247]: Return Trigger
+                - generic [ref=e248]: 判断人会不会真的回来下一轮。
+                - generic [ref=e249]: 判断产品成立
+        - generic [ref=e250]:
+          - generic [ref=e251]:
+            - heading "Correction Ledger Demo" [level=2] [ref=e252]
+            - generic [ref=e253]: 把这轮压成 1 个 next step
+          - generic [ref=e255]:
+            - generic [ref=e256]:
+              - generic [ref=e257]:
+                - generic [ref=e258]: STEP 1 · SESSION
+                - heading "先定这轮状态" [level=3] [ref=e259]
+                - generic [ref=e260]:
+                  - button "断练后重启 别先追表现，先确认身体和拍子有没有重新接上。" [ref=e261] [cursor=pointer]:
+                    - generic [ref=e262]: 断练后重启
+                    - generic [ref=e263]: 别先追表现，先确认身体和拍子有没有重新接上。
+                  - button "拍子总乱 先守住脚下和节拍边界，不急着做大动作和髋。" [ref=e264] [cursor=pointer]:
+                    - generic [ref=e265]: 拍子总乱
+                    - generic [ref=e266]: 先守住脚下和节拍边界，不急着做大动作和髋。
+                  - button "已经知道卡点 别再模糊地说“感觉不对”，先把问题落到身体部位。" [ref=e267] [cursor=pointer]:
+                    - generic [ref=e268]: 已经知道卡点
+                    - generic [ref=e269]: 别再模糊地说“感觉不对”，先把问题落到身体部位。
+                  - button "准备录切片 录切片不是为了更花，而是为了下轮更会练。" [ref=e270] [cursor=pointer]:
+                    - generic [ref=e271]: 准备录切片
+                    - generic [ref=e272]: 录切片不是为了更花，而是为了下轮更会练。
+              - generic [ref=e273]:
+                - generic [ref=e274]: STEP 2 · DANCE / FOCUS
+                - heading "把问题压成落点" [level=3] [ref=e275]
+                - generic [ref=e276]:
+                  - button "伦巴 2-3-4-1" [ref=e277] [cursor=pointer]:
+                    - generic [ref=e278]: 伦巴
+                    - generic [ref=e279]: 2-3-4-1
+                  - button "恰恰 2-3-4&1" [ref=e280] [cursor=pointer]:
+                    - generic [ref=e281]: 恰恰
+                    - generic [ref=e282]: 2-3-4&1
+                  - button "桑巴 1-a-2" [ref=e283] [cursor=pointer]:
+                    - generic [ref=e284]: 桑巴
+                    - generic [ref=e285]: 1-a-2
+                - generic [ref=e286]:
+                  - button "重心 每一步都问自己：我有没有真的到脚下？" [ref=e287] [cursor=pointer]:
+                    - generic [ref=e288]: 重心
+                    - generic [ref=e289]: 每一步都问自己：我有没有真的到脚下？
+                  - button "髋 先过重心，再让髋自然完成，不要抢在脚前面。" [ref=e290] [cursor=pointer]:
+                    - generic [ref=e291]: 髋
+                    - generic [ref=e292]: 先过重心，再让髋自然完成，不要抢在脚前面。
+                  - button "脚下 把步幅收小，让节拍和方向先变清楚。" [ref=e293] [cursor=pointer]:
+                    - generic [ref=e294]: 脚下
+                    - generic [ref=e295]: 把步幅收小，让节拍和方向先变清楚。
+                  - button "上身 视线稳定，肩颈放松，别让上身先乱掉。" [ref=e296] [cursor=pointer]:
+                    - generic [ref=e297]: 上身
+                    - generic [ref=e298]: 视线稳定，肩颈放松，别让上身先乱掉。
+              - generic [ref=e299]:
+                - generic [ref=e300]: STEP 3 · CHECKLIST
+                - heading "这一轮成立条件" [level=3] [ref=e301]
+                - generic [ref=e302]:
+                  - strong [ref=e304]: 先录 15 秒
+                  - strong [ref=e306]: 只修 1 个点
+                  - strong [ref=e308]: 回看时先说问题
+                  - strong [ref=e310]: 留下下一步
+            - generic [ref=e311]:
+              - generic [ref=e312]: CORRECTION LEDGER DEMO
+              - heading "这一轮只改 1 个点，再留下一轮 witness" [level=3] [ref=e313]
+              - generic [ref=e314]:
+                - generic [ref=e315]:
+                  - generic [ref=e316]: SESSION LENS
+                  - strong [ref=e317]: 伦巴 · 断练后重启 · 重心
+                  - paragraph [ref=e318]: 先录最慢那一轮，看自己是不是真的又回到舞里了。
+                - generic [ref=e319]:
+                  - generic [ref=e320]: THIS ROUND
+                  - strong [ref=e321]: 重心
+                  - paragraph [ref=e322]: 每一步都让重心完整到脚掌，不要留在两脚中间。
+                - generic [ref=e323]:
+                  - generic [ref=e324]: WHY THIS BODY PART
+                  - strong [ref=e325]: 伦巴
+                  - paragraph [ref=e326]: 对应旧站 Body System 里最基础也最常见的卡点。
+                - generic [ref=e327]:
+                  - generic [ref=e328]: RETURN GATE
+                  - strong [ref=e329]: 下一轮判断
+                  - paragraph [ref=e330]: 做完这一轮后，如果你能复述“下轮先改 重心”，这轮就成立。
+              - generic [ref=e331]:
+                - generic [ref=e332]: NEXT STEP WITNESS
+                - paragraph [ref=e333]: 做完后只留一句“我下次先把哪里接回来”。 下轮继续先盯 重心：每一步都让重心完整到脚掌，不要留在两脚中间。
+              - textbox "补一句你自己的 witness" [ref=e335]:
+                - /placeholder: 例如：下次先守住 2-3 的重心。
+              - button "保存这一轮 witness" [ref=e337] [cursor=pointer]
+        - generic [ref=e338]:
+          - generic [ref=e339]:
+            - heading "Body Map / Practice Queue" [level=2] [ref=e340]
+            - generic [ref=e341]: 让 witness 继续变成热区和下一轮队列
+          - generic [ref=e343]:
+            - generic [ref=e344]:
+              - generic [ref=e345]:
+                - generic [ref=e346]:
+                  - generic [ref=e347]: BODY MAP SNAPSHOT
+                  - heading "把问题压成身体热区" [level=3] [ref=e348]
+                - generic [ref=e349]: 按 witness 聚合
+              - paragraph [ref=e350]: 先看最近问题主要落到哪一块身体，不把反馈继续散掉。
+              - generic [ref=e351]:
+                - generic [ref=e352]:
+                  - generic [ref=e353]:
+                    - generic [ref=e354]:
+                      - generic [ref=e355]: FOCUS AREA
+                      - heading "重心" [level=4] [ref=e356]
+                    - generic [ref=e357]: 暂无
+                  - paragraph [ref=e358]: 对应旧站 Body System 里最基础也最常见的卡点。
+                  - generic [ref=e359]: 每一步都问自己：我有没有真的到脚下？
+                  - generic [ref=e360]: 这一块还没长出真实 witness。等问题落到这里，它才算成立。
+                - generic [ref=e361]:
+                  - generic [ref=e362]:
+                    - generic [ref=e363]:
+                      - generic [ref=e364]: FOCUS AREA
+                      - heading "髋" [level=4] [ref=e365]
+                    - generic [ref=e366]: 暂无
+                  - paragraph [ref=e367]: 它适合用来验证“问题能不能被压成一个具体动作句”。
+                  - generic [ref=e368]: 先过重心，再让髋自然完成，不要抢在脚前面。
+                  - generic [ref=e369]: 这一块还没长出真实 witness。等问题落到这里，它才算成立。
+                - generic [ref=e370]:
+                  - generic [ref=e371]:
+                    - generic [ref=e372]:
+                      - generic [ref=e373]: FOCUS AREA
+                      - heading "脚下" [level=4] [ref=e374]
+                    - generic [ref=e375]: 暂无
+                  - paragraph [ref=e376]: 这通常最容易从视频回看里直接看出差异。
+                  - generic [ref=e377]: 把步幅收小，让节拍和方向先变清楚。
+                  - generic [ref=e378]: 这一块还没长出真实 witness。等问题落到这里，它才算成立。
+                - generic [ref=e379]:
+                  - generic [ref=e380]:
+                    - generic [ref=e381]:
+                      - generic [ref=e382]: FOCUS AREA
+                      - heading "上身" [level=4] [ref=e383]
+                    - generic [ref=e384]: 暂无
+                  - paragraph [ref=e385]: 它能验证“不是所有问题都要先从腿脚修起”。
+                  - generic [ref=e386]: 视线稳定，肩颈放松，别让上身先乱掉。
+                  - generic [ref=e387]: 这一块还没长出真实 witness。等问题落到这里，它才算成立。
+            - generic [ref=e388]:
+              - generic [ref=e389]:
+                - generic [ref=e390]:
+                  - generic [ref=e391]: PRACTICE QUEUE
+                  - heading "让下轮继续成为队列" [level=3] [ref=e392]
+                - generic [ref=e393]: 等待 witness
+              - paragraph [ref=e394]: 如果这块成立，Dance OS 就开始真的拥有“下轮从哪里继续”的产品层。
+        - generic [ref=e395]:
+          - generic [ref=e396]:
+            - heading "本页依据" [level=2] [ref=e397]
+            - generic [ref=e398]: 飞书骨架 + 旧站修正逻辑
+          - generic [ref=e399]:
+            - generic [ref=e400]:
+              - heading "1 · 真实来源" [level=3] [ref=e401]
+              - generic [ref=e402]:
+                - generic [ref=e403]:
+                  - generic [ref=e404]:
+                    - strong [ref=e405]: DANCE OS DEMO v1.0
+                    - generic [ref=e406]: product-and-brand-demo
+                  - generic [ref=e407]: 产品语言
+                - generic [ref=e408]:
+                  - generic [ref=e409]:
+                    - strong [ref=e410]: 拉丁dance os构思
+                    - generic [ref=e411]: system-architecture
+                  - generic [ref=e412]: 系统母结构
+                - generic [ref=e413]:
+                  - generic [ref=e414]:
+                    - strong [ref=e415]: 直播计划
+                    - generic [ref=e416]: content-and-ip
+                  - generic [ref=e417]: witness / return
+                - generic [ref=e418]:
+                  - generic [ref=e419]:
+                    - strong [ref=e420]: Body System
+                    - generic [ref=e421]: legacy proof
+                  - generic [ref=e422]: 问题落点
+            - generic [ref=e423]:
+              - heading "2 · 产品成立条件" [level=3] [ref=e424]
+              - generic [ref=e425]:
+                - generic [ref=e426]:
+                  - generic [ref=e427]:
+                    - strong [ref=e428]: 录 15 秒
+                    - generic [ref=e429]: session lens
+                  - generic [ref=e430]: 先看见问题
+                - generic [ref=e431]:
+                  - generic [ref=e432]:
+                    - strong [ref=e433]: 定位 1 个点
+                    - generic [ref=e434]: body map
+                  - generic [ref=e435]: 问题别悬空
+                - generic [ref=e436]:
+                  - generic [ref=e437]:
+                    - strong [ref=e438]: 写下下一步
+                    - generic [ref=e439]: ledger / queue
+                  - generic [ref=e440]: 下一轮继续改
+                - generic [ref=e441]:
+                  - generic [ref=e442]:
+                    - strong [ref=e443]: 判断会不会回来
+                    - generic [ref=e444]: return trigger
+                  - generic [ref=e445]: 产品是否成立
+        - generic [ref=e446]:
+          - generic [ref=e447]: LATINOS · Dance OS
+          - generic [ref=e448]: 结论：先做录 / 看 / 记 / 下一步，再谈更复杂的分析
+  - alert [ref=e449]

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=../#assets">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dance OS · Redirecting</title>
+  <style>
+    :root{
+      --bg:#0A0A0B;
+      --surface:#141416;
+      --line:#2B2B2F;
+      --text:#F5F5F4;
+      --muted:#9C9C9F;
+      --violet:#9D6FE0;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:var(--bg);
+      color:var(--text);
+      font-family:"Noto Sans SC",sans-serif;
+    }
+    .card{
+      width:min(560px, calc(100vw - 40px));
+      padding:28px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:var(--surface);
+    }
+    h1{ margin:0 0 10px; font-size:22px; }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.7; }
+    a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:11px 16px;
+      border-radius:10px;
+      color:#0A0A0B;
+      background:var(--violet);
+      text-decoration:none;
+      font-weight:700;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>正在进入 Dance OS</h1>
+    <p>这个路径已经并入同一套深色工作台。若没有自动跳转，请点下面的按钮。</p>
+    <a href="../#assets">打开 Dance OS 模块</a>
+  </div>
+  <script>
+    window.location.replace('../#assets');
+  </script>
+</body>
+</html>

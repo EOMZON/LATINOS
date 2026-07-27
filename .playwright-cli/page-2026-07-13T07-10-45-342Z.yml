@@ -1,0 +1,476 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: 舞
+        - generic [ref=e6]: 拉丁练习入口
+        - generic [ref=e7]: PRACTICE LOG · SINCE 2026
+      - navigation [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e10]: Live
+          - link "今日总览" [ref=e11] [cursor=pointer]:
+            - /url: /
+          - link "旧站 Proof" [ref=e13] [cursor=pointer]:
+            - /url: /legacy/
+        - generic [ref=e15]:
+          - generic [ref=e16]: Library
+          - link "Daily Latin" [ref=e17] [cursor=pointer]:
+            - /url: /daily-latin/
+          - link "Dance OS" [ref=e19] [cursor=pointer]:
+            - /url: /dance-os/
+        - generic [ref=e21]:
+          - generic [ref=e22]: Tools
+          - link "来源与规则" [ref=e23] [cursor=pointer]:
+            - /url: /tools/
+        - generic [ref=e25]:
+          - generic [ref=e26]: Plan
+          - link "路线图" [ref=e27] [cursor=pointer]:
+            - /url: /roadmap/
+          - link "状态看板" [ref=e29] [cursor=pointer]:
+            - /url: /dashboard/
+        - generic [ref=e31]:
+          - generic [ref=e32]: About
+          - link "关于这条线" [ref=e33] [cursor=pointer]:
+            - /url: /about/
+      - generic [ref=e35]:
+        - generic [ref=e36]: TODAY READY · 8 ROUTES
+        - text: 先看旧站 / 再进 Daily / 或去 Dance OS
+    - main [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e43]: Daily Latin
+            - heading "把今天这一轮压成最小入口" [level=1] [ref=e44]
+          - generic [ref=e45]: route · /daily-latin
+        - generic [ref=e46]:
+          - link "总览" [ref=e47] [cursor=pointer]:
+            - /url: "#daily-overview"
+          - link "状态" [ref=e48] [cursor=pointer]:
+            - /url: "#entry-states"
+          - link "Demo" [ref=e49] [cursor=pointer]:
+            - /url: "#today-loop-demo"
+          - link "去向" [ref=e50] [cursor=pointer]:
+            - /url: "#daily-next-bridge"
+          - link "回流" [ref=e51] [cursor=pointer]:
+            - /url: "#live-return-bridge"
+          - link "依据" [ref=e52] [cursor=pointer]:
+            - /url: "#daily-sources"
+          - link "动作库" [ref=e53] [cursor=pointer]:
+            - /url: "#daily-library"
+        - paragraph [ref=e54]: 这页不负责讲完整拉丁体系，只负责把今天这一轮收成一个能开始、能做完、能回来的入口。
+        - generic [ref=e56]:
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - generic [ref=e60]: DAILY ENTRY SNAPSHOT
+              - heading "状态分流 / 4 步起步 / 回流判断" [level=4] [ref=e61]
+            - generic [ref=e62]:
+              - generic [ref=e63]:
+                - generic [ref=e64]: 入口状态
+                - strong [ref=e65]: "4"
+              - generic [ref=e66]:
+                - generic [ref=e67]: 主线舞
+                - strong [ref=e68]: "3"
+              - generic [ref=e69]:
+                - generic [ref=e70]: 起步动作
+                - strong [ref=e71]: "4"
+              - generic [ref=e72]:
+                - generic [ref=e73]: 回流方向
+                - strong [ref=e74]: "3"
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - strong [ref=e77]: 先判断
+                - paragraph [ref=e78]: 先判断属于哪种开始状态，不把所有人推到同一入口。
+              - generic [ref=e79]:
+                - strong [ref=e80]: 再开始
+                - paragraph [ref=e81]: 先把今天这轮做完，不先讲完整体系。
+              - generic [ref=e82]:
+                - strong [ref=e83]: 再回流
+                - paragraph [ref=e84]: 直播、clip 和 Dance OS 都要回到下一轮。
+          - generic [ref=e85]:
+            - heading "Daily Latin Demo" [level=3] [ref=e86]
+            - generic [ref=e87]: entry states · practice loop · content witness
+            - generic [ref=e88]:
+              - generic [ref=e89]: 定位
+              - generic [ref=e90]: Daily 入口，不是资料目录。
+              - generic [ref=e91]: 对应飞书
+              - generic [ref=e92]: 直播计划 / 拉丁dance os构思
+              - generic [ref=e93]: 今日动作
+              - generic [ref=e94]: 先选状态，再做完一轮。
+              - generic [ref=e95]: 做完后
+              - generic [ref=e96]: 继续 / 留 witness / 桥接 OS
+            - generic [ref=e97]:
+              - generic [ref=e98]: 状态分流
+              - generic [ref=e99]: 4 步起步
+              - generic [ref=e100]: Daily Witness
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - heading "今天从哪里开始 / 这一轮怎么做完" [level=2] [ref=e103]
+            - generic [ref=e104]: 先按状态进去，再把这一轮压成可回来的 witness
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - generic [ref=e107]:
+                - generic [ref=e108]: ENTRY STATES
+                - heading "入口状态" [level=3] [ref=e109]
+                - paragraph [ref=e110]: 先分清今天属于哪种开始状态，不先把自己扔进资料库。
+              - generic [ref=e111]:
+                - generic [ref=e112]:
+                  - generic [ref=e113]: ENTRY 01
+                  - heading "完全没开始过" [level=3] [ref=e114]
+                  - generic [ref=e115]:
+                    - generic [ref=e116]: 先做什么
+                    - generic [ref=e117]: Why Latin / 适配判断
+                  - generic [ref=e118]:
+                    - generic [ref=e119]: 目标
+                    - generic [ref=e120]: 先开始第一轮
+                  - generic [ref=e121]: 先判断适不适合，不急着证明自己会不会跳。
+                - generic [ref=e122]:
+                  - generic [ref=e123]: ENTRY 02
+                  - heading "断练后重启" [level=3] [ref=e124]
+                  - generic [ref=e125]:
+                    - generic [ref=e126]: 先做什么
+                    - generic [ref=e127]: 4 步起步
+                  - generic [ref=e128]:
+                    - generic [ref=e129]: 目标
+                    - generic [ref=e130]: 做完今天这一轮
+                  - generic [ref=e131]: 别先补旧课，先把今天这一轮接回来。
+                - generic [ref=e132]:
+                  - generic [ref=e133]: ENTRY 03
+                  - heading "已经有具体卡点" [level=3] [ref=e134]
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: 先做什么
+                    - generic [ref=e137]: Body System / Fix One Point
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: 目标
+                    - generic [ref=e140]: 只修 1 个问题
+                  - generic [ref=e141]: 别再泛泛复盘，先说清这次到底卡哪。
+            - generic [ref=e142]:
+              - generic [ref=e143]:
+                - generic [ref=e144]: DAILY LOOP
+                - heading "Daily Loop" [level=3] [ref=e145]
+                - paragraph [ref=e146]: 先做完一个最小闭环，再决定是继续、归档，还是桥接到 Dance OS。
+              - generic [ref=e147]:
+                - generic [ref=e148]:
+                  - generic [ref=e149]: LOOP 01
+                  - heading "先选状态" [level=3] [ref=e150]
+                  - generic [ref=e151]:
+                    - generic [ref=e152]: 输入
+                    - generic [ref=e153]: 今天在哪种状态
+                  - generic [ref=e154]:
+                    - generic [ref=e155]: 输出
+                    - generic [ref=e156]: 进入对应入口
+                  - generic [ref=e157]: 先从今天怎么开始，不从资料库开始。
+                - generic [ref=e158]:
+                  - generic [ref=e159]: LOOP 02
+                  - heading "做完这一轮" [level=3] [ref=e160]
+                  - generic [ref=e161]:
+                    - generic [ref=e162]: 时长
+                    - generic [ref=e163]: 10-15 分钟
+                  - generic [ref=e164]:
+                    - generic [ref=e165]: 约束
+                    - generic [ref=e166]: 只做最小闭环
+                  - generic [ref=e167]: 先做完一轮，再决定要不要拉长计划。
+                - generic [ref=e168]:
+                  - generic [ref=e169]: LOOP 03
+                  - heading "只留 1 个点" [level=3] [ref=e170]
+                  - generic [ref=e171]:
+                    - generic [ref=e172]: 记录
+                    - generic [ref=e173]: 下一次只改哪里
+                  - generic [ref=e174]:
+                    - generic [ref=e175]: 回流
+                    - generic [ref=e176]: 形成 witness
+                  - generic [ref=e177]: 说不出下次先改哪，就还没形成 witness。
+        - generic [ref=e178]:
+          - generic [ref=e179]:
+            - heading "Today Loop Demo" [level=2] [ref=e180]
+            - generic [ref=e181]: 先选状态，再压出一句 witness
+          - generic [ref=e183]:
+            - generic [ref=e184]:
+              - generic [ref=e185]:
+                - generic [ref=e186]: STEP 1 · ENTRY STATE
+                - heading "先定今天状态" [level=3] [ref=e187]
+                - generic [ref=e188]:
+                  - button "完全新手 先收住“我会不会跳”的焦虑。" [ref=e189] [cursor=pointer]:
+                    - generic [ref=e190]: 完全新手
+                    - generic [ref=e191]: 先收住“我会不会跳”的焦虑。
+                  - button "断练重启 不是补旧课，是把身体和拍子接回来。" [ref=e192] [cursor=pointer]:
+                    - generic [ref=e193]: 断练重启
+                    - generic [ref=e194]: 不是补旧课，是把身体和拍子接回来。
+                  - button "已有卡点 别说“感觉不对”，先说清卡点。" [ref=e195] [cursor=pointer]:
+                    - generic [ref=e196]: 已有卡点
+                    - generic [ref=e197]: 别说“感觉不对”，先说清卡点。
+                  - button "刚看直播 别继续围观，把那一句带回脚下。" [ref=e198] [cursor=pointer]:
+                    - generic [ref=e199]: 刚看直播
+                    - generic [ref=e200]: 别继续围观，把那一句带回脚下。
+              - generic [ref=e201]:
+                - generic [ref=e202]: STEP 2 · TODAY DANCE
+                - heading "选今天主线舞" [level=3] [ref=e203]
+                - generic [ref=e204]:
+                  - button "伦巴 先慢一点，把重心真的过脚。" [ref=e205] [cursor=pointer]:
+                    - generic [ref=e206]: 伦巴
+                    - generic [ref=e207]: 先慢一点，把重心真的过脚。
+                  - button "恰恰 先把脚下边界压清楚。" [ref=e208] [cursor=pointer]:
+                    - generic [ref=e209]: 恰恰
+                    - generic [ref=e210]: 先把脚下边界压清楚。
+                  - button "桑巴 先找连续节奏。" [ref=e211] [cursor=pointer]:
+                    - generic [ref=e212]: 桑巴
+                    - generic [ref=e213]: 先找连续节奏。
+              - generic [ref=e214]:
+                - generic [ref=e215]: STEP 3 · START LOOP
+                - heading "把这一轮做完" [level=3] [ref=e216]
+                - generic [ref=e217]:
+                  - button "先定状态 OPEN" [ref=e218] [cursor=pointer]:
+                    - strong [ref=e220]: 先定状态
+                    - generic [ref=e221]: OPEN
+                  - button "做完一轮 OPEN" [ref=e222] [cursor=pointer]:
+                    - strong [ref=e224]: 做完一轮
+                    - generic [ref=e225]: OPEN
+                  - button "留1点 OPEN" [ref=e226] [cursor=pointer]:
+                    - strong [ref=e228]: 留1点
+                    - generic [ref=e229]: OPEN
+                  - button "写回流 OPEN" [ref=e230] [cursor=pointer]:
+                    - strong [ref=e232]: 写回流
+                    - generic [ref=e233]: OPEN
+            - generic [ref=e234]:
+              - generic [ref=e235]: DAILY LOOP PLANNER
+              - heading "先做完，再留 witness" [level=3] [ref=e236]
+              - generic [ref=e237]:
+                - generic [ref=e238]:
+                  - generic [ref=e239]: ENTRY GATE
+                  - strong [ref=e240]: 完全没开始过
+                  - paragraph [ref=e241]: 先判断为什么想学。
+                - generic [ref=e242]:
+                  - generic [ref=e243]: THIS ROUND
+                  - strong [ref=e244]: 伦巴
+                  - paragraph [ref=e245]: 伦巴 · 先慢下来，让重心真的过脚。
+                - generic [ref=e246]:
+                  - generic [ref=e247]: ROUND GOAL
+                  - strong [ref=e248]: 做完最小闭环
+                  - paragraph [ref=e249]: 先把身体带进第一轮。
+                - generic [ref=e250]:
+                  - generic [ref=e251]: TODAY SCORE
+                  - strong [ref=e252]: 0%
+              - generic [ref=e253]:
+                - generic [ref=e254]: RETURN WITNESS
+                - paragraph [ref=e255]: 下次先重复同一入口。 先确认重心有没有过脚。
+              - textbox "补一句提示" [ref=e257]:
+                - /placeholder: 例如：先把脚下边界做清楚。
+              - generic [ref=e258]:
+                - button "保存 witness" [ref=e259] [cursor=pointer]
+                - button "重置" [ref=e260] [cursor=pointer]
+              - paragraph [ref=e261]: 保存后会在这里显示最近一条 witness。
+        - generic [ref=e262]:
+          - generic [ref=e263]:
+            - heading "这轮做完后，从哪里继续" [level=2] [ref=e264]
+            - generic [ref=e265]: 继续留在 Daily / 回到直播回流 / 已说清卡点就桥接到 Dance OS
+          - generic [ref=e266]:
+            - link "NEXT 01 ↗ 继续 Daily 这一轮 断练后重启 / 还没做完今天这轮 下一步 先把同一轮做完，再留一句 witness 还没说清下次先改哪时，不要急着桥接 OS。" [ref=e267] [cursor=pointer]:
+              - /url: /daily-latin/?state=restart&dance=cha#today-loop-demo
+              - generic [ref=e268]:
+                - generic [ref=e269]: NEXT 01
+                - generic [ref=e270]: ↗
+              - heading "继续 Daily 这一轮" [level=3] [ref=e271]
+              - generic [ref=e272]: 断练后重启 / 还没做完今天这轮
+              - generic [ref=e273]:
+                - generic [ref=e274]: 下一步
+                - generic [ref=e275]: 先把同一轮做完，再留一句 witness
+              - generic [ref=e276]: 还没说清下次先改哪时，不要急着桥接 OS。
+            - link "NEXT 02 ↗ 直播 / 切片 回到 Daily 刚看完直播 / 已经有一句想带回脚下 下一步 先把那一句带回这一轮，再判断要不要归档 内容不是结束，先让那一句重新回到练习里。" [ref=e277] [cursor=pointer]:
+              - /url: /daily-latin/?state=after-live&dance=rumba#live-return-bridge
+              - generic [ref=e278]:
+                - generic [ref=e279]: NEXT 02
+                - generic [ref=e280]: ↗
+              - heading "直播 / 切片 回到 Daily" [level=3] [ref=e281]
+              - generic [ref=e282]: 刚看完直播 / 已经有一句想带回脚下
+              - generic [ref=e283]:
+                - generic [ref=e284]: 下一步
+                - generic [ref=e285]: 先把那一句带回这一轮，再判断要不要归档
+              - generic [ref=e286]: 内容不是结束，先让那一句重新回到练习里。
+            - link "NEXT 03 ↗ 已经能说清卡点，桥接 Dance OS 已经知道是重心 / 髋 / 脚下 / 上身哪一层 下一步 把卡点压成 correction 和下一轮动作句 说清卡点后，就别继续停在 Daily 入口层。" [ref=e287] [cursor=pointer]:
+              - /url: /dance-os/?state=body&profile=cha&focus=feet#correction-ledger-demo
+              - generic [ref=e288]:
+                - generic [ref=e289]: NEXT 03
+                - generic [ref=e290]: ↗
+              - heading "已经能说清卡点，桥接 Dance OS" [level=3] [ref=e291]
+              - generic [ref=e292]: 已经知道是重心 / 髋 / 脚下 / 上身哪一层
+              - generic [ref=e293]:
+                - generic [ref=e294]: 下一步
+                - generic [ref=e295]: 把卡点压成 correction 和下一轮动作句
+              - generic [ref=e296]: 说清卡点后，就别继续停在 Daily 入口层。
+        - generic [ref=e297]:
+          - generic [ref=e298]:
+            - generic [ref=e299]:
+              - heading "Live Return / Clip Bridge / Archive Jump" [level=2] [ref=e300]
+              - generic [ref=e301]: 这一轮做完后，判断继续 / 归档 / 桥接
+            - generic [ref=e303]:
+              - generic [ref=e304]:
+                - generic [ref=e306]:
+                  - generic [ref=e307]: LIVE RETURN / CLIP BRIDGE / ARCHIVE JUMP
+                  - heading "做完后，回哪" [level=3] [ref=e308]
+                - generic [ref=e309]:
+                  - generic [ref=e310]:
+                    - generic [ref=e311]: LIVE
+                    - heading "直播句回这一轮" [level=4] [ref=e312]
+                    - paragraph [ref=e313]: 先把直播里的一句动作句带回这一轮。
+                    - generic [ref=e314]: 看完直播，先回 Daily。
+                    - link "回 Daily" [ref=e316] [cursor=pointer]:
+                      - /url: /daily-latin/#today-loop-demo
+                  - generic [ref=e317]:
+                    - generic [ref=e318]: CLIP
+                    - heading "压成 clip 证据" [level=4] [ref=e319]
+                    - paragraph [ref=e320]: 不是每轮都要发内容，但至少留一条能接上的证据。
+                    - generic [ref=e321]: 先做完，再决定要不要留 archive。
+                    - link "看归档" [ref=e323] [cursor=pointer]:
+                      - /url: /dashboard/
+                  - generic [ref=e324]:
+                    - generic [ref=e325]: BRIDGE
+                    - heading "卡点桥接到 OS" [level=4] [ref=e326]
+                    - paragraph [ref=e327]: 能说清卡点时，就桥到更具体的身体修正。
+                    - generic [ref=e328]: 能说清卡点，就桥接 Dance OS。
+                    - link "去 OS" [ref=e330] [cursor=pointer]:
+                      - /url: /dance-os/#correction-ledger-demo
+              - generic [ref=e331]:
+                - generic [ref=e333]:
+                  - generic [ref=e334]: NEXT DAILY QUEUE
+                  - heading "继续还是桥接" [level=3] [ref=e335]
+                - generic [ref=e336]: 先保存一条 witness，再回来判断是继续还是桥接。
+          - generic [ref=e337]:
+            - generic [ref=e338]:
+              - heading "旧站已验证的起步原则" [level=2] [ref=e339]
+              - generic [ref=e340]: 把旧站里已验证有效的起步逻辑保留下来
+            - generic [ref=e341]:
+              - generic [ref=e342]:
+                - generic [ref=e343]: PROOF 01
+                - heading "先判断" [level=3] [ref=e344]
+                - generic [ref=e345]:
+                  - generic [ref=e346]: 旧站来源
+                  - generic [ref=e347]: Why Latin
+                - generic [ref=e348]:
+                  - generic [ref=e349]: 现在作用
+                  - generic [ref=e350]: 先判断适不适合
+                - generic [ref=e351]: 旧站已经证明：起步前先判断。
+              - generic [ref=e352]:
+                - generic [ref=e353]: PROOF 02
+                - heading "再开始" [level=3] [ref=e354]
+                - generic [ref=e355]:
+                  - generic [ref=e356]: 旧站来源
+                  - generic [ref=e357]: Learning Path
+                - generic [ref=e358]:
+                  - generic [ref=e359]: 现在作用
+                  - generic [ref=e360]: 做完今天这一轮
+                - generic [ref=e361]: 有效的不是大计划，而是一轮可完成的开始。
+              - generic [ref=e362]:
+                - generic [ref=e363]: PROOF 03
+                - heading "只修一个点" [level=3] [ref=e364]
+                - generic [ref=e365]:
+                  - generic [ref=e366]: 旧站来源
+                  - generic [ref=e367]: Body System
+                - generic [ref=e368]:
+                  - generic [ref=e369]: 现在作用
+                  - generic [ref=e370]: 定位这次只改哪里
+                - generic [ref=e371]: Daily 后续自然要回到 Body Map / Correction Ledger。
+        - generic [ref=e372]:
+          - generic [ref=e373]:
+            - heading "本页依据" [level=2] [ref=e374]
+            - generic [ref=e375]: 飞书主线 + 旧站起步原则一起托住这个入口
+          - generic [ref=e376]:
+            - generic [ref=e377]:
+              - heading "1 · 真实来源" [level=3] [ref=e378]
+              - generic [ref=e379]:
+                - generic [ref=e380]:
+                  - generic [ref=e381]:
+                    - strong [ref=e382]: 直播计划
+                    - generic [ref=e383]: content-and-ip
+                  - generic [ref=e384]: Daily 回流逻辑
+                - generic [ref=e385]:
+                  - generic [ref=e386]:
+                    - strong [ref=e387]: 拉丁dance os构思
+                    - generic [ref=e388]: system-architecture
+                  - generic [ref=e389]: 入口骨架
+                - generic [ref=e390]:
+                  - generic [ref=e391]:
+                    - strong [ref=e392]: 旧站 tagline
+                    - generic [ref=e393]: legacy proof
+                  - generic [ref=e394]: 起步 promise
+                - generic [ref=e395]:
+                  - generic [ref=e396]:
+                    - strong [ref=e397]: 旧站 learning path
+                    - generic [ref=e398]: legacy proof
+                  - generic [ref=e399]: 4 步起步
+            - generic [ref=e400]:
+              - heading "2 · 当前入口原则" [level=3] [ref=e401]
+              - generic [ref=e402]:
+                - generic [ref=e403]:
+                  - generic [ref=e404]:
+                    - strong [ref=e405]: 先判断
+                    - generic [ref=e406]: Why Latin
+                  - generic [ref=e407]: 不是所有人都先开练
+                - generic [ref=e408]:
+                  - generic [ref=e409]:
+                    - strong [ref=e410]: 再开始
+                    - generic [ref=e411]: Start Loop
+                  - generic [ref=e412]: 10-15 分钟一轮
+                - generic [ref=e413]:
+                  - generic [ref=e414]:
+                    - strong [ref=e415]: 只留 1 个点
+                    - generic [ref=e416]: next step
+                  - generic [ref=e417]: 把下次继续点留下
+                - generic [ref=e418]:
+                  - generic [ref=e419]:
+                    - strong [ref=e420]: 回到 Body System
+                    - generic [ref=e421]: Dance OS bridge
+                  - generic [ref=e422]: 卡点要落回修正
+        - generic [ref=e423]:
+          - generic [ref=e424]:
+            - heading "Daily Latin 动作库" [level=2] [ref=e425]
+            - generic [ref=e426]: 只切当前真要看的那一组
+          - tablist "DAILY LATIN LIBRARY tabs" [ref=e427]:
+            - tab "路径" [selected] [ref=e428]
+            - tab "全部" [ref=e429]
+            - tab "通用" [ref=e430]
+            - tab "伦巴" [ref=e431]
+            - tab "恰恰" [ref=e432]
+          - generic [ref=e433]:
+            - generic [ref=e434]:
+              - generic [ref=e435]: 路径
+              - generic [ref=e436]:
+                - heading "Why Latin" [level=4] [ref=e437]
+                - generic [ref=e438]: Fit Check
+              - generic [ref=e439]:
+                - generic [ref=e440]: 判断入口
+                - generic [ref=e441]: 旧站映射
+            - generic [ref=e442]:
+              - generic [ref=e443]: 路径
+              - generic [ref=e444]:
+                - heading "Body System" [level=4] [ref=e445]
+                - generic [ref=e446]: Fix One Point
+              - generic [ref=e447]:
+                - generic [ref=e448]: 卡点修复
+                - generic [ref=e449]: 回流路径
+            - generic [ref=e450]:
+              - generic [ref=e451]: 路径
+              - generic [ref=e452]:
+                - heading "直播回流" [level=4] [ref=e453]
+                - generic [ref=e454]: Return To Daily
+              - generic [ref=e455]:
+                - generic [ref=e456]: witness
+                - generic [ref=e457]: 下一轮继续
+            - generic [ref=e458]:
+              - generic [ref=e459]: 路径
+              - generic [ref=e460]:
+                - heading "切片归档" [level=4] [ref=e461]
+                - generic [ref=e462]: Clip Archive
+              - generic [ref=e463]:
+                - generic [ref=e464]: 内容资产
+                - generic [ref=e465]: 副产品
+            - generic [ref=e466]:
+              - generic [ref=e467]: 未解锁
+              - generic [ref=e468]:
+                - heading "直播排期页" [level=4] [ref=e469]
+                - generic [ref=e470]: Day 2
+              - generic [ref=e471]:
+                - generic [ref=e472]: —
+                - generic [ref=e473]: —
+        - generic [ref=e474]:
+          - generic [ref=e475]: LATINOS · Daily Latin
+          - generic [ref=e476]: 结论：先把今天这一轮接上，再扩直播与内容承接
+  - alert [ref=e477]

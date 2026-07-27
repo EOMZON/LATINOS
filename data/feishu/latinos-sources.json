@@ -1,0 +1,43 @@
+{
+  "workspace": "LATIN",
+  "policy": {
+    "sourceOfTruth": "feishu",
+    "notion": "deprecated",
+    "rule": "If old materials mention Notion, map the intent back to the Feishu docs or Feishu structure instead of expanding a Notion workflow."
+  },
+  "root": {
+    "title": "LATIN",
+    "url": "https://my.feishu.cn/wiki/Gq7fwe8YXiRfDpkiRkzcFLkwnFx",
+    "token": "Gq7fwe8YXiRfDpkiRkzcFLkwnFx"
+  },
+  "documents": [
+    {
+      "title": "直播计划",
+      "url": "https://my.feishu.cn/wiki/OvOYwW61hiEmvWkGjzycgTG6noh",
+      "token": "OvOYwW61hiEmvWkGjzycgTG6noh",
+      "role": "content-and-ip",
+      "note": "Clarifies that the valuable core is not just streaming, but using content to drive growth and turn the growth path into assets."
+    },
+    {
+      "title": "拉丁dance os构思",
+      "url": "https://my.feishu.cn/wiki/YIP7wirg5iuCRnkSwDtcDsxTnac",
+      "token": "YIP7wirg5iuCRnkSwDtcDsxTnac",
+      "role": "system-architecture",
+      "note": "Frames the project as Latin Dance OS: Daily直播IP + 拉丁成长网站 + Dance Tools."
+    },
+    {
+      "title": "DANCE OS DEMO v1.0",
+      "url": "https://my.feishu.cn/wiki/JtkowI9tRiJaZOkHB6LcX3nHnNb",
+      "token": "JtkowI9tRiJaZOkHB6LcX3nHnNb",
+      "role": "product-and-brand-demo",
+      "note": "Pushes the project toward a real product/brand system rather than starting with raw coding."
+    },
+    {
+      "title": "后续待处理的任务",
+      "url": "https://my.feishu.cn/wiki/XvKDwUWe7ibIDwkoTLzcPNBWnM3",
+      "token": "XvKDwUWe7ibIDwkoTLzcPNBWnM3",
+      "role": "project-execution-index",
+      "note": "Bitable execution index. The LATINOS project master record was added on 2026-07-13 with background, current state, evidence, Top 1, next steps, risks, and the local master brief path."
+    }
+  ]
+}

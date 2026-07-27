@@ -1,0 +1,16 @@
+:root{
+  --bg:#0A0A0B;
+  --surface:#141416;
+  --surface-2:#1C1C1F;
+  --line:#2B2B2F;
+  --text:#F5F5F4;
+  --muted:#9C9C9F;
+  --muted-2:#6B6B6F;
+  --violet:#9D6FE0;
+  --violet-strong:#8459CC;
+  --violet-deep:#221D2E;
+  --brick:#C4432E;
+  --ring-track:#222226;
+  --green:#7CB88A;
+  --content-max:1180px;
+}

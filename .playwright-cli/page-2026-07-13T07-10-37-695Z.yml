@@ -1,0 +1,304 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: 舞
+        - generic [ref=e6]: 拉丁练习入口
+        - generic [ref=e7]: PRACTICE LOG · SINCE 2026
+      - navigation [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e10]: Live
+          - link "今日总览" [ref=e11] [cursor=pointer]:
+            - /url: /
+          - link "旧站 Proof" [ref=e13] [cursor=pointer]:
+            - /url: /legacy/
+        - generic [ref=e15]:
+          - generic [ref=e16]: Library
+          - link "Daily Latin" [ref=e17] [cursor=pointer]:
+            - /url: /daily-latin/
+          - link "Dance OS" [ref=e19] [cursor=pointer]:
+            - /url: /dance-os/
+        - generic [ref=e21]:
+          - generic [ref=e22]: Tools
+          - link "来源与规则" [ref=e23] [cursor=pointer]:
+            - /url: /tools/
+        - generic [ref=e25]:
+          - generic [ref=e26]: Plan
+          - link "路线图" [ref=e27] [cursor=pointer]:
+            - /url: /roadmap/
+          - link "状态看板" [ref=e29] [cursor=pointer]:
+            - /url: /dashboard/
+        - generic [ref=e31]:
+          - generic [ref=e32]: About
+          - link "关于这条线" [ref=e33] [cursor=pointer]:
+            - /url: /about/
+      - generic [ref=e35]:
+        - generic [ref=e36]: TODAY READY · 8 ROUTES
+        - text: 先看旧站 / 再进 Daily / 或去 Dance OS
+    - main [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]: 给成人初学者、重拾者和有卡点的人
+          - heading "先选今天的状态，把这一轮做完。" [level=1] [ref=e43]
+        - generic [ref=e44]: 2026-07-07 · 今天先选状态，再做一轮
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]: TODAY
+            - generic [ref=e49]: 先做 1 条入口
+          - generic [ref=e50]: 今天先做：恰恰重启 1 轮
+          - generic [ref=e51]: 先把恰恰的脚下边界做清楚。 直播回流或拍子卡点，也先回到这一轮。
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - text: 今日入口
+              - strong [ref=e54]: "3"
+            - generic [ref=e55]:
+              - text: 真实页面
+              - strong [ref=e56]: "8"
+            - generic [ref=e57]:
+              - text: 回流轨道
+              - strong [ref=e58]: "3"
+        - generic [ref=e59]:
+          - generic [ref=e65]:
+            - generic [ref=e66]: 3条
+            - generic [ref=e67]: 今天入口
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: 这一轮先守住
+              - generic [ref=e71]: 恰恰脚下边界，不急着加快
+            - link "先去做恰恰这一轮 →" [ref=e72] [cursor=pointer]:
+              - /url: /daily-latin/?state=restart&dance=cha#today-loop-demo
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - heading "连续练习 · 12 周热力图" [level=2] [ref=e75]
+          - generic [ref=e76]: 深色 = 这一周留下了入口或回流点
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e79]: Week 1 → Week 12
+            - generic [ref=e80]: 少多
+          - generic [ref=e85]:
+            - generic "Week slot 1" [ref=e86]
+            - generic "Week slot 2" [ref=e87]
+            - generic "Week slot 3" [ref=e88]
+            - generic "Week slot 4" [ref=e89]
+            - generic "Week slot 5" [ref=e90]
+            - generic "Week slot 6" [ref=e91]
+            - generic "Week slot 7" [ref=e92]
+            - generic "Week slot 8" [ref=e93]
+            - generic "Week slot 9" [ref=e94]
+            - generic "Week slot 10" [ref=e95]
+            - generic "Week slot 11" [ref=e96]
+            - generic "Week slot 12" [ref=e97]
+            - generic "Week slot 13" [ref=e98]
+            - generic "Week slot 14" [ref=e99]
+            - generic "Week slot 15" [ref=e100]
+            - generic "Week slot 16" [ref=e101]
+            - generic "Week slot 17" [ref=e102]
+            - generic "Week slot 18" [ref=e103]
+            - generic "Week slot 19" [ref=e104]
+            - generic "Week slot 20" [ref=e105]
+            - generic "Week slot 21" [ref=e106]
+            - generic "Week slot 22" [ref=e107]
+            - generic "Week slot 23" [ref=e108]
+            - generic "Week slot 24" [ref=e109]
+            - generic "Week slot 25" [ref=e110]
+            - generic "Week slot 26" [ref=e111]
+            - generic "Week slot 27" [ref=e112]
+            - generic "Week slot 28" [ref=e113]
+            - generic "Week slot 29" [ref=e114]
+            - generic "Week slot 30" [ref=e115]
+            - generic "Week slot 31" [ref=e116]
+            - generic "Week slot 32" [ref=e117]
+            - generic "Week slot 33" [ref=e118]
+            - generic "Week slot 34" [ref=e119]
+            - generic "Week slot 35" [ref=e120]
+            - generic "Week slot 36" [ref=e121]
+            - generic "Week slot 37" [ref=e122]
+            - generic "Week slot 38" [ref=e123]
+            - generic "Week slot 39" [ref=e124]
+            - generic "Week slot 40" [ref=e125]
+            - generic "Week slot 41" [ref=e126]
+            - generic "Week slot 42" [ref=e127]
+            - generic "Week slot 43" [ref=e128]
+            - generic "Week slot 44" [ref=e129]
+            - generic "Week slot 45" [ref=e130]
+            - generic "Week slot 46" [ref=e131]
+            - generic "Week slot 47" [ref=e132]
+            - generic "Week slot 48" [ref=e133]
+            - generic "Week slot 49" [ref=e134]
+            - generic "Week slot 50" [ref=e135]
+            - generic "Week slot 51" [ref=e136]
+            - generic "Week slot 52" [ref=e137]
+            - generic "Week slot 53" [ref=e138]
+            - generic "Week slot 54" [ref=e139]
+            - generic "Week slot 55" [ref=e140]
+            - generic "Week slot 56" [ref=e141]
+            - generic "Week slot 57" [ref=e142]
+            - generic "Week slot 58" [ref=e143]
+            - generic "Week slot 59" [ref=e144]
+            - generic "Week slot 60" [ref=e145]
+            - generic "Week slot 61" [ref=e146]
+            - generic "Week slot 62" [ref=e147]
+            - generic "Week slot 63" [ref=e148]
+            - generic "Week slot 64" [ref=e149]
+            - generic "Week slot 65" [ref=e150]
+            - generic "Week slot 66" [ref=e151]
+            - generic "Week slot 67" [ref=e152]
+            - generic "Week slot 68" [ref=e153]
+            - generic "Week slot 69" [ref=e154]
+            - generic "Week slot 70" [ref=e155]
+            - generic "Week slot 71" [ref=e156]
+            - generic "Week slot 72" [ref=e157]
+            - generic "Week slot 73" [ref=e158]
+            - generic "Week slot 74" [ref=e159]
+            - generic "Week slot 75" [ref=e160]
+            - generic "Week slot 76" [ref=e161]
+            - generic "Week slot 77" [ref=e162]
+            - generic "Week slot 78" [ref=e163]
+            - generic "Week slot 79" [ref=e164]
+            - generic "Week slot 80" [ref=e165]
+          - generic [ref=e166]: 灰格 = 还没开始 · 紫格 = 这一周已有可回来的入口
+      - generic [ref=e168]:
+        - generic [ref=e169]:
+          - heading "工作台" [level=2] [ref=e170]
+          - generic [ref=e171]: 先回到刚做完的一轮，再进入今天真正要用的模块
+        - generic [ref=e172]:
+          - paragraph [ref=e173]: 先不要把所有东西一起打开。先回到刚做完的一轮，再从旧站、Daily Latin、Dance OS 里选一个真实入口续上今天。独立 Dance OS Demo 已经存在，但首页先负责把入口关系讲清楚。
+          - generic [ref=e175]:
+            - generic [ref=e176]:
+              - generic [ref=e177]: 刚做完的一轮 → 下一轮
+              - generic [ref=e178]:
+                - link "Daily" [ref=e179] [cursor=pointer]:
+                  - /url: /daily-latin/
+                - link "Dance OS" [ref=e180] [cursor=pointer]:
+                  - /url: /dance-os/
+            - generic [ref=e181]:
+              - generic [ref=e182]:
+                - generic [ref=e183]:
+                  - generic [ref=e184]: LATEST
+                  - generic [ref=e185]: 刚完成
+                - strong [ref=e186]: 恰恰 · 断练后重启
+                - generic [ref=e187]: Daily Loop · restart
+                - link "继续这一轮" [ref=e189] [cursor=pointer]:
+                  - /url: /daily-latin/?state=restart&dance=cha#today-loop-demo
+              - generic [ref=e190]:
+                - generic [ref=e191]:
+                  - generic [ref=e192]: DAILY
+                  - generic [ref=e193]: 回流
+                - strong [ref=e194]: 伦巴 · 刚看完直播
+                - generic [ref=e195]: Daily Return · live
+                - link "回到 Daily" [ref=e197] [cursor=pointer]:
+                  - /url: /daily-latin/?state=after-live&dance=rumba#today-loop-demo
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - generic [ref=e200]: DANCE
+                  - generic [ref=e201]: 回流
+                - strong [ref=e202]: 伦巴 · 拍子卡点
+                - generic [ref=e203]: Dance OS · correction
+                - link "回到 Dance OS" [ref=e205] [cursor=pointer]:
+                  - /url: /dance-os/?state=beat&profile=rumba&focus=feet#correction-ledger-demo
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - generic [ref=e208]: INDEPENDENT DEMO
+              - heading "独立 Dance OS Demo 已经可以单独进入" [level=3] [ref=e209]
+              - paragraph [ref=e210]: "首页先承接这个工具现在已经长到了哪里，再把人送去 `/dance-os` 看入口关系；如果本机独立壳已经启动，也可以直接打开继续验证。"
+            - generic [ref=e211]:
+              - generic [ref=e212]:
+                - generic [ref=e213]: 已成立链路
+                - generic [ref=e214]: archive -> queue -> return trigger
+              - generic [ref=e215]:
+                - generic [ref=e216]: 当前承接
+                - generic [ref=e217]: frontdoor 解释边界，独立 demo 继续长产品链
+              - generic [ref=e218]:
+                - generic [ref=e219]: 为什么不直切域名
+                - generic [ref=e220]: 先本地 / preview 验证，不把旧站入口和新壳混写
+            - generic [ref=e221]:
+              - link "先看独立 Demo 入口 →" [ref=e222] [cursor=pointer]:
+                - /url: /dance-os/#independent-demo-entry
+              - link "本机打开独立壳（3301）" [ref=e223] [cursor=pointer]:
+                - /url: http://127.0.0.1:3301
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - generic [ref=e226]:
+                - generic [ref=e227]:
+                  - generic [ref=e228]: TODAY ENTRY
+                  - heading "今天先进入" [level=3] [ref=e229]
+                - paragraph [ref=e230]: 先从能立刻开始的一条真实入口进去。
+              - generic [ref=e231]:
+                - link "MODULE ↗ 旧站起步页 先判断今天从哪里重启 作用 判断今天该从哪开始 已上线 proof，继续保留成当前起步入口。" [ref=e232] [cursor=pointer]:
+                  - /url: /legacy/
+                  - generic [ref=e233]:
+                    - generic [ref=e234]: MODULE
+                    - generic [ref=e235]: ↗
+                  - heading "旧站起步页" [level=3] [ref=e236]
+                  - generic [ref=e237]: 先判断今天从哪里重启
+                  - generic [ref=e238]:
+                    - generic [ref=e239]: 作用
+                    - generic [ref=e240]: 判断今天该从哪开始
+                  - generic [ref=e241]: 已上线 proof，继续保留成当前起步入口。
+                - link "MODULE ↗ Daily Latin 断练后重启 / 刚看完直播 动作 把今天这一轮做完 先按状态进去，再把这一轮压成 witness。" [ref=e242] [cursor=pointer]:
+                  - /url: /daily-latin/
+                  - generic [ref=e243]:
+                    - generic [ref=e244]: MODULE
+                    - generic [ref=e245]: ↗
+                  - heading "Daily Latin" [level=3] [ref=e246]
+                  - generic [ref=e247]: 断练后重启 / 刚看完直播
+                  - generic [ref=e248]:
+                    - generic [ref=e249]: 动作
+                    - generic [ref=e250]: 把今天这一轮做完
+                  - generic [ref=e251]: 先按状态进去，再把这一轮压成 witness。
+                - link "MODULE ↗ Dance OS 拍子乱 / 脚下乱 / 重心乱 动作 把卡点压成下一步 route demo 已可看，独立 demo 入口也已在这一层明确承接。" [ref=e252] [cursor=pointer]:
+                  - /url: /dance-os/
+                  - generic [ref=e253]:
+                    - generic [ref=e254]: MODULE
+                    - generic [ref=e255]: ↗
+                  - heading "Dance OS" [level=3] [ref=e256]
+                  - generic [ref=e257]: 拍子乱 / 脚下乱 / 重心乱
+                  - generic [ref=e258]:
+                    - generic [ref=e259]: 动作
+                    - generic [ref=e260]: 把卡点压成下一步
+                  - generic [ref=e261]: route demo 已可看，独立 demo 入口也已在这一层明确承接。
+            - generic [ref=e262]:
+              - generic [ref=e263]:
+                - generic [ref=e264]:
+                  - generic [ref=e265]: KEEP STRUCTURE
+                  - heading "保持结构" [level=3] [ref=e266]
+                - paragraph [ref=e267]: 来源、路线、旧站和状态层继续给这个 frontdoor 托底。
+              - generic [ref=e268]:
+                - link "MODULE ↗ 来源与规则 LATIN / 直播计划 / DEMO 规则 飞书为准 / 旧站先保留 先看内容从哪里来，再看现在按什么规则推进。" [ref=e269] [cursor=pointer]:
+                  - /url: /tools/
+                  - generic [ref=e270]:
+                    - generic [ref=e271]: MODULE
+                    - generic [ref=e272]: ↗
+                  - heading "来源与规则" [level=3] [ref=e273]
+                  - generic [ref=e274]: LATIN / 直播计划 / DEMO
+                  - generic [ref=e275]:
+                    - generic [ref=e276]: 规则
+                    - generic [ref=e277]: 飞书为准 / 旧站先保留
+                  - generic [ref=e278]: 先看内容从哪里来，再看现在按什么规则推进。
+                - link "MODULE ↗ 路线图 入口先站稳 / demo 继续并行 下一步 旧域名先不急着切 先把新入口跑顺，再讨论旧域名承接。" [ref=e279] [cursor=pointer]:
+                  - /url: /roadmap/
+                  - generic [ref=e280]:
+                    - generic [ref=e281]: MODULE
+                    - generic [ref=e282]: ↗
+                  - heading "路线图" [level=3] [ref=e283]
+                  - generic [ref=e284]: 入口先站稳 / demo 继续并行
+                  - generic [ref=e285]:
+                    - generic [ref=e286]: 下一步
+                    - generic [ref=e287]: 旧域名先不急着切
+                  - generic [ref=e288]: 先把新入口跑顺，再讨论旧域名承接。
+                - link "MODULE ↗ 当前状态 哪些页面已经跑顺 回流 Daily / Dance 回流状态 先看真实状态，不靠口头解释。" [ref=e289] [cursor=pointer]:
+                  - /url: /dashboard/
+                  - generic [ref=e290]:
+                    - generic [ref=e291]: MODULE
+                    - generic [ref=e292]: ↗
+                  - heading "当前状态" [level=3] [ref=e293]
+                  - generic [ref=e294]: 哪些页面已经跑顺
+                  - generic [ref=e295]:
+                    - generic [ref=e296]: 回流
+                    - generic [ref=e297]: Daily / Dance 回流状态
+                  - generic [ref=e298]: 先看真实状态，不靠口头解释。
+      - generic [ref=e299]:
+        - generic [ref=e300]: 恰恰重启 / 直播回流 / 拍子卡点
+        - generic [ref=e301]: 旧站 / Daily / Dance
+  - alert [ref=e302]

@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>LATINOS · 工作台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0B;
+  --surface:#141416;
+  --surface-2:#1C1C1F;
+  --line:#2B2B2F;
+  --text:#F5F5F4;
+  --muted:#9C9C9F;
+  --muted-2:#6B6B6F;
+
+  --violet:#9D6FE0;
+  --violet-strong:#8459CC;
+  --violet-deep:#221D2E;
+  --violet-dim:#1D1B22;
+
+  --brick:#C4432E;
+  --ring-track:#222226;
+  --green:#7CB88A;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans SC', sans-serif;
+  line-height:1.6;
+}
+::selection{ background:var(--violet); color:var(--bg); }
+.display{ font-family:'Bebas Neue','Noto Sans SC',sans-serif; letter-spacing:.02em; }
+.mono{ font-family:'Space Mono', monospace; }
+a{ color:inherit; text-decoration:none; }
+
+.shell{ display:grid; grid-template-columns:232px 1fr; min-height:100vh; }
+
+.sidebar{
+  background:var(--surface); border-right:1px solid var(--line);
+  padding:28px 20px; display:flex; flex-direction:column; gap:34px;
+  position:sticky; top:0; height:100vh;
+}
+.brand{ display:flex; flex-direction:column; gap:4px; }
+.brand .mark{
+  width:34px; height:34px; border-radius:3px;
+  background:var(--text);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif; color:var(--bg); font-size:18px;
+  position:relative;
+}
+.brand .mark::after{
+  content:""; position:absolute; bottom:-2px; right:-2px; width:8px; height:8px;
+  border-radius:50%; background:var(--violet); border:2px solid var(--surface);
+}
+.brand .name{ font-size:15px; font-weight:700; margin-top:10px; }
+.brand .sub{ font-size:11px; color:var(--muted-2); letter-spacing:.08em; }
+
+.nav{ display:flex; flex-direction:column; gap:2px; }
+.nav-label{ font-size:10px; color:var(--muted-2); letter-spacing:.14em; margin:14px 6px 6px; text-transform:uppercase; }
+.nav a, .nav button{
+  display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:6px;
+  font-size:13.5px; color:var(--muted); border-left:2px solid transparent;
+}
+.nav a .dot, .nav button .dot{
+  width:5px; height:5px; border-radius:50%; background:var(--muted-2); flex-shrink:0;
+}
+.nav a.active, .nav button.active{
+  color:var(--text); background:var(--surface-2); border-left:2px solid var(--violet);
+}
+.nav a.active .dot, .nav button.active .dot{ background:var(--violet); }
+.nav a:hover, .nav button:hover{ color:var(--text); }
+
+.sidebar-foot{ margin-top:auto; padding-top:18px; border-top:1px solid var(--line); font-size:11px; color:var(--muted-2); }
+.sidebar-foot .live-badge{ display:inline-flex; align-items:center; gap:6px; color:var(--violet); font-weight:700; margin-bottom:6px; }
+.sidebar-foot .live-badge .p{
+  width:6px; height:6px; border-radius:50%; background:var(--violet); animation:pulse 1.8s infinite;
+}
+@keyframes pulse{
+  0%{ box-shadow:0 0 0 0 rgba(157,111,224,.5);}
+  70%{ box-shadow:0 0 0 7px rgba(157,111,224,0);}
+  100%{ box-shadow:0 0 0 0 rgba(157,111,224,0);}
+}
+
+.main{ padding:40px 48px 100px; max-width:1180px; }
+@media (max-width:860px){ .main{ padding:24px 20px 80px; } }
+
+.topline{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:38px; flex-wrap:wrap; gap:16px; }
+.eyebrow{ font-size:11px; letter-spacing:.16em; color:var(--muted-2); text-transform:uppercase; margin-bottom:6px; }
+.topline h1{ font-size:15px; font-weight:500; color:var(--muted); }
+.today-pill{ font-size:12px; color:var(--muted); background:var(--surface); border:1px solid var(--line); padding:7px 12px; border-radius:20px; }
+
+.hero{ display:grid; grid-template-columns:1.1fr .9fr; gap:28px; margin-bottom:56px; }
+@media (max-width:860px){ .hero{ grid-template-columns:1fr; } }
+.hero-left{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:36px 34px; position:relative; overflow:hidden;
+}
+.hero-left::before{
+  content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px;
+  border-radius:50%; background:radial-gradient(circle, rgba(157,111,224,.10), transparent 70%);
+}
+.day-row{ display:flex; align-items:baseline; gap:16px; }
+.day-num{ font-size:96px; line-height:.85; color:var(--text); }
+.day-num sup{ font-size:22px; color:var(--muted); font-family:'Noto Sans SC'; margin-left:6px; }
+.hero-tag{ font-size:20px; font-weight:700; margin:18px 0 8px; }
+.hero-desc{ font-size:13.5px; color:var(--muted); max-width:40ch; }
+.stat-strip{ display:flex; gap:26px; margin-top:26px; flex-wrap:wrap; }
+.stat-strip div{ font-size:11px; color:var(--muted-2); }
+.stat-strip strong{ display:block; font-family:'Space Mono'; font-size:18px; color:var(--text); font-weight:700; }
+
+.hero-right{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:28px;
+  display:flex; flex-direction:column; gap:18px; justify-content:center; align-items:center; text-align:center;
+}
+.ring-wrap{ position:relative; width:170px; height:170px; }
+.ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-center .n{ font-family:'Space Mono'; font-size:26px; font-weight:700; color:var(--violet); }
+.ring-center .l{ font-size:10px; color:var(--muted-2); letter-spacing:.08em; }
+.live-session{ width:100%; text-align:left; border-top:1px dashed var(--line); padding-top:16px; }
+.live-session .k{ font-size:10px; color:var(--muted-2); letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; }
+.live-session .v{ font-size:15px; font-weight:700; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-top:12px;
+  width:100%; background:var(--text); color:var(--bg); font-weight:700; font-size:13px;
+  padding:11px; border-radius:8px; border:none; cursor:pointer;
+}
+.btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--muted); }
+.btn.brick{ background:var(--violet); color:var(--bg); }
+.link-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+.link-row .btn{ width:auto; margin-top:0; padding:10px 16px; }
+
+.sec-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:8px; }
+.sec-head h2{
+  font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--text);
+  display:flex; align-items:center; gap:10px;
+}
+.sec-head h2::before{ content:""; width:16px; height:2px; background:var(--text); display:inline-block; }
+.sec-head .more{ font-size:11.5px; color:var(--muted-2); }
+section{ margin-bottom:56px; }
+
+.heatmap-card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px 28px; }
+.heatmap-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+.heatmap-top .legend{ display:flex; gap:5px; align-items:center; font-size:10px; color:var(--muted-2); }
+.legend .sq{ width:10px; height:10px; border-radius:2px; }
+.heat-grid{ display:grid; grid-template-columns:repeat(25,1fr); gap:4px; }
+@media (max-width:860px){ .heat-grid{ grid-template-columns:repeat(14,1fr); } }
+.cell{ aspect-ratio:1; border-radius:3px; background:var(--ring-track); cursor:default; }
+.heat-note{ margin-top:16px; font-size:11.5px; color:var(--muted-2); }
+
+.log-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:860px){ .log-grid{ grid-template-columns:1fr; } }
+.log-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:20px; transition:border-color .15s; }
+.log-card:hover{ border-color:#3a3a3f; }
+.log-card .day{ font-family:'Space Mono'; font-size:11px; color:var(--muted-2); margin-bottom:8px; }
+.log-card h3{ font-size:15px; font-weight:700; margin-bottom:10px; }
+.log-row{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:6px; }
+.log-row b{ color:var(--text); font-weight:500; }
+.stars{ color:var(--text); letter-spacing:2px; font-size:12px; }
+.log-note{ font-size:12px; color:var(--muted-2); margin-top:10px; border-top:1px solid var(--line); padding-top:10px; }
+
+.move-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+@media (max-width:860px){ .move-grid{ grid-template-columns:repeat(2,1fr); } }
+.move-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px;
+  position:relative; min-height:130px; display:flex; flex-direction:column; justify-content:space-between;
+  transition:border-color .15s, transform .15s;
+}
+.move-card:hover{ border-color:#3a3a3f; transform:translateY(-2px); }
+.move-card .tag{
+  position:absolute; top:14px; right:14px; font-size:9.5px; color:var(--muted-2);
+  border:1px solid var(--line); padding:2px 7px; border-radius:10px;
+}
+.move-card h4{ font-size:16px; font-weight:700; margin-top:6px; }
+.move-card .en{ font-size:10.5px; color:var(--muted-2); font-family:'Space Mono'; }
+.move-card .meta{ display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:14px; }
+
+.asset-grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
+@media (max-width:860px){ .asset-grid{ grid-template-columns:repeat(3,1fr); } }
+.asset{
+  aspect-ratio:9/13; border-radius:10px; background:var(--surface-2); border:1px solid var(--line);
+  display:flex; flex-direction:column; justify-content:flex-end; padding:8px; position:relative; overflow:hidden;
+}
+.asset::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,.55)); }
+.asset .platform{
+  position:absolute; top:8px; left:8px; z-index:2; font-size:9px; padding:2px 6px; border-radius:8px; font-weight:700;
+}
+.asset .platform.demo{ background:var(--violet); color:var(--bg); }
+.asset .platform.feishu{ background:var(--text); color:var(--bg); }
+.asset .platform.live{ background:var(--brick); color:var(--text); }
+.asset .platform.repo{ background:var(--surface); color:var(--text); border:1px solid var(--line); }
+.asset .cap{ position:relative; z-index:2; font-size:10.5px; font-weight:600; }
+
+.tabs{ display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+.tab{
+  font-size:12px; padding:7px 14px; border-radius:20px; border:1px solid var(--line);
+  color:var(--muted); cursor:pointer; background:transparent;
+}
+.tab.active{ background:var(--violet-deep); border-color:var(--violet); color:var(--text); }
+
+.roadmap{ display:flex; flex-direction:column; gap:0; border-left:1px solid var(--line); margin-left:8px; }
+.phase{ position:relative; padding:0 0 34px 28px; }
+.phase::before{
+  content:""; position:absolute; left:-6px; top:2px; width:11px; height:11px;
+  border-radius:50%; background:var(--bg); border:2px solid var(--line);
+}
+.phase.done::before{ background:var(--violet); }
+.phase .ph-label{ font-size:10px; letter-spacing:.1em; color:var(--muted-2); text-transform:uppercase; margin-bottom:4px; }
+.phase h4{ font-size:16px; font-weight:700; margin-bottom:6px; }
+.phase p{ font-size:12.5px; color:var(--muted); max-width:60ch; }
+
+.course-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:860px){ .course-grid{ grid-template-columns:1fr; } }
+.course-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:20px; }
+.course-card .status{ display:inline-block; font-size:10px; padding:3px 9px; border-radius:10px; margin-bottom:12px; }
+.course-card .status.soon{ background:var(--violet-deep); color:var(--violet); }
+.course-card .status.locked{ background:var(--surface-2); color:var(--muted-2); border:1px solid var(--line); }
+.course-card h4{ font-size:15px; font-weight:700; margin-bottom:8px; }
+.course-card p{ font-size:12px; color:var(--muted); }
+
+.dash-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+@media (max-width:860px){ .dash-grid{ grid-template-columns:repeat(2,1fr); } }
+.dash-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px; }
+.dash-card .l{ font-size:11px; color:var(--muted-2); margin-bottom:8px; }
+.dash-card .v{ font-family:'Space Mono'; font-size:24px; font-weight:700; }
+.dash-card .d{ font-size:11px; color:var(--green); margin-top:6px; }
+
+.bars{ display:flex; align-items:flex-end; gap:8px; height:140px; margin-top:20px; }
+.bars .bar{ flex:1; background:linear-gradient(180deg, var(--text), var(--muted-2)); border-radius:4px 4px 0 0; position:relative; }
+.bars .bar span{ position:absolute; bottom:-20px; left:0; right:0; text-align:center; font-size:10px; color:var(--muted-2); }
+
+.detail{
+  display:grid; grid-template-columns:1fr 1fr; gap:28px; background:var(--surface);
+  border:1px solid var(--line); border-radius:14px; padding:28px; margin-bottom:56px;
+}
+@media (max-width:860px){ .detail{ grid-template-columns:1fr; } }
+.detail .stage{
+  aspect-ratio:4/3; border-radius:10px; background:var(--surface-2); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center; color:var(--muted-2); font-size:12px; text-align:center; padding:22px;
+}
+.detail h3{ font-size:22px; font-weight:700; margin-bottom:6px; }
+.detail .en{ font-family:'Space Mono'; font-size:11px; color:var(--muted-2); margin-bottom:18px; }
+.kv{ display:grid; grid-template-columns:110px 1fr; gap:10px 12px; font-size:13px; margin-bottom:10px; }
+.kv b{ color:var(--muted-2); font-weight:500; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+.chip{ font-size:11px; padding:4px 10px; border-radius:20px; background:var(--surface-2); border:1px solid var(--line); color:var(--muted); }
+
+.prose{ max-width:64ch; font-size:14px; color:var(--muted); }
+.prose h3{ color:var(--text); font-size:16px; margin:22px 0 8px; }
+.prose p{ margin-bottom:12px; }
+
+.source-list{ display:flex; flex-direction:column; gap:8px; }
+.source-row{
+  display:flex; justify-content:space-between; gap:12px; align-items:flex-start;
+  font-size:12.5px; color:var(--muted); padding:10px 12px; border:1px solid var(--line);
+  border-radius:8px; background:var(--surface-2);
+}
+.source-row strong{ color:var(--text); display:block; margin-bottom:2px; }
+.source-row .mini{ font-size:10px; color:var(--muted-2); font-family:'Space Mono'; }
+
+footer{
+  border-top:1px solid var(--line); padding-top:28px; font-size:12px; color:var(--muted-2);
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+}
+
+button.log-card, .nav button, .tab{
+  font-family:inherit; text-align:left; appearance:none; background:transparent; border:none; cursor:pointer;
+}
+button.log-card{ display:block; width:100%; }
+.nav button{ width:100%; justify-content:flex-start; }
+
+.page{ display:none; }
+.page.active{ display:block; animation:fadeIn .18s ease; }
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(4px);} to{ opacity:1; transform:translateY(0);} }
+
+@media (max-width:860px){
+  .shell{ grid-template-columns:1fr; }
+  .sidebar{ display:none; }
+  .main{ max-width:none; width:100%; padding:24px 20px 80px; }
+  .topline{ margin-bottom:28px; }
+  .tabs{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .asset-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .kv{ grid-template-columns:84px 1fr; }
+  .link-row .btn{ width:100%; justify-content:center; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">L</div>
+      <div class="name">LATINOS 工作台</div>
+      <div class="sub">LATIN DANCE OS · SINCE 2026</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Home</div>
+      <button class="active" data-page="home"><span class="dot"></span>总览首页</button>
+      <button data-page="log"><span class="dot"></span>旧站 Proof</button>
+      <div class="nav-label">Demos</div>
+      <button data-page="moves"><span class="dot"></span>Daily Latin</button>
+      <button data-page="assets"><span class="dot"></span>Dance OS</button>
+      <div class="nav-label">Control</div>
+      <button data-page="tools"><span class="dot"></span>来源与规则</button>
+      <div class="nav-label">Plan</div>
+      <button data-page="roadmap"><span class="dot"></span>路线图</button>
+      <button data-page="dashboard"><span class="dot"></span>状态看板</button>
+      <div class="nav-label">About</div>
+      <button data-page="about"><span class="dot"></span>关于这条线</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="live-badge"><span class="p"></span>PREVIEW READY</div>
+      旧站保留 · 新版并行 · 飞书为准
+    </div>
+  </aside>
+
+  <main class="main">
+<div class="page active" data-page="home">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">LATINOS · WORKBENCH</div>
+        <h1>把拉丁这条线，收成一个长期系统</h1>
+      </div>
+      <div class="today-pill">2026-07-05 · legacy 保留 / preview 在线</div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-left">
+        <div class="day-row">
+          <span class="day-num display">V0.1</span>
+          <sup>母仓结构与 preview 已建立</sup>
+        </div>
+        <div class="hero-tag">当前：旧站入口 · Daily Latin · Dance OS 并行</div>
+        <div class="hero-desc">不是再做一堆分散页面，而是把飞书、旧站、demo、规范和域名策略收成一套能长期演化的拉丁系统。</div>
+        <div class="stat-strip">
+          <div>旧站 proof<strong>1</strong></div>
+          <div>demo 分支<strong>2</strong></div>
+          <div>飞书主文档<strong>3</strong></div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#222226" stroke-width="10"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#9D6FE0" stroke-width="10"
+              stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="186.2"/>
+          </svg>
+          <div class="ring-center">
+            <div class="n">43%</div>
+            <div class="l">结构闭环完成</div>
+          </div>
+        </div>
+        <div class="live-session">
+          <div class="k">当前预览</div>
+          <div class="v">frontdoor-omega.vercel.app</div>
+        </div>
+        <a class="btn brick" href="https://frontdoor-omega.vercel.app" target="_blank" rel="noreferrer">打开新预览 →</a>
+      </div>
+    </div>
+
+    <section>
+      <div class="sec-head">
+        <h2>推进热力图 · 12 周</h2>
+        <span class="more">深色 = 结构 / 内容 / demo 推进更完整</span>
+      </div>
+      <div class="heatmap-card">
+        <div class="heatmap-top">
+          <div class="mono" style="font-size:12px;color:var(--muted);">Week 1 → Week 12</div>
+          <div class="legend">少
+            <span class="sq" style="background:#222226"></span>
+            <span class="sq" style="background:#3A3A3F"></span>
+            <span class="sq" style="background:#6B5F78"></span>
+            <span class="sq" style="background:#9D6FE0"></span>
+            多
+          </div>
+        </div>
+        <div class="heat-grid" id="heatGrid"></div>
+        <div class="heat-note">灰格 = 未开始 · 紫格 = 当周完成了关键结构动作</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>工作台</h2><span class="more">点击进入对应模块</span></div>
+      <div class="log-grid" style="grid-template-columns:repeat(3,1fr);">
+        <button class="log-card" data-page="log">
+          <div class="day mono">MODULE</div>
+          <h3>旧站 Proof</h3>
+          <div class="log-note" style="border-top:none;padding-top:0;">现有 live 站点 · 先保留，不推倒</div>
+        </button>
+        <button class="log-card" data-page="moves">
+          <div class="day mono">MODULE</div>
+          <h3>Daily Latin</h3>
+          <div class="log-note" style="border-top:none;padding-top:0;">今天怎么开始练 · 最小入口 demo</div>
+        </button>
+        <button class="log-card" data-page="assets">
+          <div class="day mono">MODULE</div>
+          <h3>Dance OS</h3>
+          <div class="log-note" style="border-top:none;padding-top:0;">动作反馈 / Correction Ledger / Body Map</div>
+        </button>
+        <button class="log-card" data-page="tools">
+          <div class="day mono">MODULE</div>
+          <h3>来源与规则</h3>
+          <div class="log-note" style="border-top:none;padding-top:0;">飞书主文档 / source of truth / repo standards</div>
+        </button>
+        <button class="log-card" data-page="roadmap">
+          <div class="day mono">MODULE</div>
+          <h3>路线图</h3>
+          <div class="log-note" style="border-top:none;padding-top:0;">Phase 1 / 2 / 3 · 先 preview，再决定域名</div>
+        </button>
+        <button class="log-card" data-page="dashboard">
+          <div class="day mono">MODULE</div>
+          <h3>状态看板</h3>
+          <div class="log-note" style="border-top:none;padding-top:0;">旧站 / demo / 飞书 / standards / preview 状态</div>
+        </button>
+      </div>
+    </section>
+
+    <footer>
+      <div>LATINOS · frontdoor / legacy / demos / Feishu</div>
+      <div>旧站保留 · 新版并行 · 先不切生产入口</div>
+    </footer>
+</div>
+
+<div class="page" data-page="log">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">旧站 Proof</div>
+        <h1>现有 live 站点，不推倒，先保留</h1>
+      </div>
+      <div class="today-pill">https://latindance.zondev.top</div>
+    </div>
+
+    <div class="detail">
+      <div class="stage">latindance.zondev.top<br>成人初学 / 断练重启入口</div>
+      <div>
+        <h3>Roya 拉丁舞起步页</h3>
+        <div class="en">source · /Users/zon/Desktop/MINE/9_latin/apps/latinDance</div>
+        <div class="kv">
+          <b>线上站点</b><span>latindance.zondev.top</span>
+          <b>当前 promise</b><span>想练拉丁舞，不知道从哪开始？</span>
+          <b>当前受众</b><span>成人爱好者、初学者、断练后想重启的人</span>
+          <b>为什么保留</b><span>它已经是公开 proof，不应该为了整理结构而被推倒。</span>
+          <b>当前角色</b><span>legacy proof / 旧版入口 / 最强公开证据</span>
+          <b>未来位置</b><span>可以保留为 `legacy`、`v1`，或新首页里的旧版入口。</span>
+        </div>
+        <div class="chips">
+          <span class="chip">Legacy Proof</span>
+          <span class="chip">Adult Beginner</span>
+          <span class="chip">Live Site</span>
+        </div>
+        <div class="link-row">
+          <a class="btn brick" href="https://latindance.zondev.top" target="_blank" rel="noreferrer">打开旧站</a>
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <div class="sec-head"><h2>现有入口模块</h2><span class="more">来自旧站的真实结构</span></div>
+      <div class="log-grid">
+        <div class="log-card">
+          <div class="day mono">MODULE 01</div>
+          <h3>Why Latin</h3>
+          <div class="log-row"><span>作用</span><b>先判断适不适合</b></div>
+          <div class="log-row"><span>位置</span><b>旧站主入口</b></div>
+          <div class="log-note">给犹豫中的用户一个低门槛判断入口，而不是一上来就要求开始练。</div>
+        </div>
+        <div class="log-card">
+          <div class="day mono">MODULE 02</div>
+          <h3>Learning Path</h3>
+          <div class="log-row"><span>作用</span><b>今天就开始练</b></div>
+          <div class="log-row"><span>核心</span><b>4 步起步任务</b></div>
+          <div class="log-note">旧站最强的地方之一，就是把“今天这一轮”压得足够轻。</div>
+        </div>
+        <div class="log-card">
+          <div class="day mono">MODULE 03</div>
+          <h3>Body System</h3>
+          <div class="log-row"><span>作用</span><b>修一个具体卡点</b></div>
+          <div class="log-row"><span>方向</span><b>重心 / 髋 / 脚下</b></div>
+          <div class="log-note">不是泛泛而谈，而是把错误落到身体层。</div>
+        </div>
+        <div class="log-card">
+          <div class="day mono">MODULE 04</div>
+          <h3>Tools</h3>
+          <div class="log-row"><span>作用</span><b>动作反馈练习台</b></div>
+          <div class="log-row"><span>角色</span><b>产品化 proof</b></div>
+          <div class="log-note">它证明这条线不只有内容入口，也有工具化可能。</div>
+        </div>
+        <div class="log-card">
+          <div class="day mono">MODULE 05</div>
+          <h3>Log</h3>
+          <div class="log-row"><span>作用</span><b>复盘样例</b></div>
+          <div class="log-row"><span>价值</span><b>witness</b></div>
+          <div class="log-note">让用户看到一节练习怎样被拆成 correction 和记忆点。</div>
+        </div>
+        <div class="log-card">
+          <div class="day mono">MODULE 06</div>
+          <h3>Join / About</h3>
+          <div class="log-row"><span>作用</span><b>联系与定位</b></div>
+          <div class="log-row"><span>价值</span><b>补足前台解释</b></div>
+          <div class="log-note">旧站已经不只是 landing page，而是一个相对完整的前台雏形。</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>LATINOS · 旧站 Proof</div>
+      <div>结论：保留它，把它当 legacy proof，不急着替换</div>
+    </footer>
+</div>
+
+<div class="page" data-page="moves">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">Daily Latin</div>
+        <h1>把“今天怎么开始练”压成最小入口</h1>
+      </div>
+      <div class="today-pill">preview · /daily-latin/</div>
+    </div>
+
+    <div class="detail">
+      <div class="stage">Daily Latin demo<br>状态分流 / 4 步起步 / daily witness</div>
+      <div>
+        <h3>Daily Latin Demo</h3>
+        <div class="en">entry states · practice loop · content witness</div>
+        <div class="kv">
+          <b>定位</b><span>不是直播页，而是 daily rhythm 的入口页。</span>
+          <b>对应飞书</b><span>直播计划 + 拉丁dance os构思</span>
+          <b>核心动作</b><span>先选状态，再做一轮，再留 1 个下次只改的点。</span>
+          <b>页面任务</b><span>把围观用户转成今天真的开始练的人。</span>
+          <b>不该做</b><span>一上来铺满全部理论、全部舞种、全部产品介绍。</span>
+          <b>下一步</b><span>把状态分流页、起步任务页、直播回流页做成第二版。</span>
+        </div>
+        <div class="chips">
+          <span class="chip">状态分流</span>
+          <span class="chip">4 步起步</span>
+          <span class="chip">Daily Witness</span>
+        </div>
+        <div class="link-row">
+          <a class="btn brick" href="#moves">进入 Daily Latin 模块</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs" id="moveTabs">
+      <button class="tab active" data-filter="all">全部</button>
+      <button class="tab" data-filter="通用">通用</button>
+      <button class="tab" data-filter="路径">路径</button>
+      <button class="tab" data-filter="伦巴">伦巴</button>
+      <button class="tab" data-filter="恰恰">恰恰</button>
+    </div>
+
+    <section style="margin-bottom:0;">
+      <div class="move-grid" id="moveGrid">
+        <div class="move-card" data-category="通用"><div class="tag">通用</div><div><h4>状态分流</h4><div class="en">Entry States</div></div><div class="meta"><span>先判断</span><span>低门槛</span></div></div>
+        <div class="move-card" data-category="通用"><div class="tag">通用</div><div><h4>4 步起步</h4><div class="en">Start Loop</div></div><div class="meta"><span>10-15 分钟</span><span>1 个点</span></div></div>
+        <div class="move-card" data-category="路径"><div class="tag">路径</div><div><h4>Why Latin</h4><div class="en">Fit Check</div></div><div class="meta"><span>判断入口</span><span>旧站映射</span></div></div>
+        <div class="move-card" data-category="路径"><div class="tag">路径</div><div><h4>Body System</h4><div class="en">Fix One Point</div></div><div class="meta"><span>卡点修复</span><span>回流路径</span></div></div>
+        <div class="move-card" data-category="伦巴"><div class="tag">伦巴</div><div><h4>Weight Transfer</h4><div class="en">重心转移</div></div><div class="meta"><span>旧站 proof</span><span>起步动作</span></div></div>
+        <div class="move-card" data-category="通用"><div class="tag">通用</div><div><h4>Cuban Motion</h4><div class="en">古巴律动</div></div><div class="meta"><span>节奏感</span><span>高频主题</span></div></div>
+        <div class="move-card" data-category="恰恰"><div class="tag">恰恰</div><div><h4>Hip Action</h4><div class="en">胯部发力</div></div><div class="meta"><span>内容拆解</span><span>切片友好</span></div></div>
+        <div class="move-card" data-category="路径"><div class="tag">路径</div><div><h4>直播回流</h4><div class="en">Return To Daily</div></div><div class="meta"><span>witness</span><span>下一轮继续</span></div></div>
+        <div class="move-card" data-category="路径"><div class="tag">路径</div><div><h4>切片归档</h4><div class="en">Clip Archive</div></div><div class="meta"><span>内容资产</span><span>副产品</span></div></div>
+        <div class="move-card" data-category="路径" style="opacity:.4;"><div class="tag">未解锁</div><div><h4>直播排期页</h4><div class="en">Day 2</div></div><div class="meta"><span>—</span><span>—</span></div></div>
+      </div>
+    </section>
+
+    <footer>
+      <div>LATINOS · Daily Latin</div>
+      <div>结论：先把 daily 入口做轻，再扩直播与内容承接</div>
+    </footer>
+</div>
+
+<div class="page" data-page="assets">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">Dance OS</div>
+        <h1>从练习过程里长出工具，不从空白产品名开始</h1>
+      </div>
+      <div class="today-pill">preview · /dance-os/</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active">全部</button>
+      <button class="tab">产品模块</button>
+      <button class="tab">来源文档</button>
+      <button class="tab">现有页面</button>
+      <button class="tab">未来工具</button>
+    </div>
+
+    <section style="margin-bottom:0;">
+      <div class="asset-grid">
+        <div class="asset"><span class="platform demo">DEMO</span><span class="cap">Session Lens</span></div>
+        <div class="asset"><span class="platform demo">DEMO</span><span class="cap">Correction Ledger</span></div>
+        <div class="asset"><span class="platform demo">DEMO</span><span class="cap">Body Map</span></div>
+        <div class="asset"><span class="platform demo">DEMO</span><span class="cap">Practice Queue</span></div>
+        <div class="asset"><span class="platform feishu">FEISHU</span><span class="cap">DANCE OS DEMO v1.0</span></div>
+        <div class="asset"><span class="platform feishu">FEISHU</span><span class="cap">拉丁dance os构思</span></div>
+        <div class="asset"><span class="platform feishu">FEISHU</span><span class="cap">直播计划</span></div>
+        <div class="asset"><span class="platform live">LIVE</span><span class="cap">旧站首页</span></div>
+        <div class="asset"><span class="platform demo">DEMO</span><span class="cap">Daily Latin Demo</span></div>
+        <div class="asset"><span class="platform demo">DEMO</span><span class="cap">Dance OS Demo</span></div>
+        <div class="asset"><span class="platform repo">REPO</span><span class="cap">source-of-truth</span></div>
+        <div class="asset"><span class="platform repo">REPO</span><span class="cap">website-strategy</span></div>
+      </div>
+    </section>
+
+    <div class="detail" style="margin-top:24px;">
+      <div class="stage">Dance OS demo<br>动作反馈 / 结构化纠错 / 下一轮训练</div>
+      <div>
+        <h3>Dance OS Demo</h3>
+        <div class="en">session lens · correction ledger · body map · practice queue</div>
+        <div class="kv">
+          <b>定位</b><span>不是再做一个网站，而是把练习过程变成可复盘、可迭代的产品体验。</span>
+          <b>最小模块</b><span>录 15 秒、定位问题、只留 1 个点、下一轮继续练。</span>
+          <b>品牌方向</b><span>像产品体系，不像技术实验台。</span>
+          <b>短期承接</b><span>先挂在 frontdoor 下验证，不急着单开新域名。</span>
+          <b>最大风险</b><span>功能表很大，但没有用户真正回来的下一轮。</span>
+          <b>当前结论</b><span>先做可用，不做全能；先做 next step，不先做大评分。</span>
+        </div>
+        <div class="chips">
+          <span class="chip">Body Map</span>
+          <span class="chip">Correction Ledger</span>
+          <span class="chip">Next Step</span>
+        </div>
+        <div class="link-row">
+          <a class="btn brick" href="#assets">进入 Dance OS 模块</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>LATINOS · Dance OS</div>
+      <div>结论：先做录 / 看 / 记 / 下一步，再谈复杂分析</div>
+    </footer>
+</div>
+
+<div class="page" data-page="tools">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">来源与规则</div>
+        <h1>飞书、规范、部署入口都在这里</h1>
+      </div>
+      <div class="today-pill">唯一 source of truth · Feishu</div>
+    </div>
+
+    <div class="detail">
+      <div>
+        <h3 style="font-size:16px;margin-bottom:14px;">1 · 飞书主来源</h3>
+        <div class="source-list">
+          <div class="source-row">
+            <div><strong>LATIN</strong><div class="mini">root wiki</div></div>
+            <span>主入口</span>
+          </div>
+          <div class="source-row">
+            <div><strong>直播计划</strong><div class="mini">content-and-ip</div></div>
+            <span>Daily Latin</span>
+          </div>
+          <div class="source-row">
+            <div><strong>拉丁dance os构思</strong><div class="mini">system-architecture</div></div>
+            <span>系统骨架</span>
+          </div>
+          <div class="source-row">
+            <div><strong>DANCE OS DEMO v1.0</strong><div class="mini">product-and-brand-demo</div></div>
+            <span>工具方向</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="font-size:16px;margin-bottom:14px;">2 · 当前关键入口</h3>
+        <div class="source-list">
+          <div class="source-row">
+            <div><strong>旧站 live</strong><div class="mini">latindance.zondev.top</div></div>
+            <span>proof</span>
+          </div>
+          <div class="source-row">
+            <div><strong>新 preview</strong><div class="mini">frontdoor-omega.vercel.app</div></div>
+            <span>preview</span>
+          </div>
+          <div class="source-row">
+            <div><strong>repo standards</strong><div class="mini">AGENTS / MEMORY / source-of-truth</div></div>
+            <span>rules</span>
+          </div>
+          <div class="source-row">
+            <div><strong>旧站源码</strong><div class="mini">MINE/9_latin/apps/latinDance</div></div>
+            <span>source</span>
+          </div>
+        </div>
+        <div class="link-row">
+          <a class="btn brick" href="https://frontdoor-omega.vercel.app" target="_blank" rel="noreferrer">打开 preview</a>
+          <a class="btn ghost" href="https://latindance.zondev.top" target="_blank" rel="noreferrer">打开旧站</a>
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <div class="prose">
+        <h3>当前规则</h3>
+        <p>从今天开始，这条线的内容源以飞书为准。历史材料里凡是提到 Notion，都默认视为旧提法，应该映射回飞书对应文档或飞书结构，而不是继续扩写新的 Notion 工作流。</p>
+        <p>旧站 `latindance.zondev.top` 是现有公开 proof，不应该为了整理结构而立即覆盖。当前策略是：保留旧站生产入口，在 `LATINOS` 里继续长 frontdoor 和两个 demo，等新入口更稳后再决定是否切主入口。</p>
+      </div>
+    </section>
+
+    <footer>
+      <div>LATINOS · 来源与规则</div>
+      <div>结论：Feishu first，legacy 保留，preview 先行</div>
+    </footer>
+</div>
+
+<div class="page" data-page="roadmap">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">路线图</div>
+        <h1>先让结构跑通，再决定要不要切生产入口</h1>
+      </div>
+      <div class="today-pill">当前阶段：Phase 1.5</div>
+    </div>
+
+    <section>
+      <div class="sec-head"><h2>三个阶段</h2></div>
+      <div class="roadmap">
+        <div class="phase done">
+          <div class="ph-label">Phase 1 · 已完成</div>
+          <h4>立母仓</h4>
+          <p>建立 `LATINOS` 目录规范、AGENTS、MEMORY、Feishu source-of-truth、旧站映射与 frontdoor 初版 preview。</p>
+        </div>
+        <div class="phase done">
+          <div class="ph-label">Phase 1.5 · 当前</div>
+          <h4>按参考样式重做前台</h4>
+          <p>把首页工作台改成你指定的深色紫系壳子，同时把 Daily Latin、Dance OS、路线图、状态看板全都收进同一个前台系统。</p>
+        </div>
+        <div class="phase">
+          <div class="ph-label">Phase 2 · 下一步</div>
+          <h4>填满两个 demo</h4>
+          <p>继续把 `Daily Latin` 和 `Dance OS` 做成更真实的第二版，补足页面、动作、回流、工具和内容承接。</p>
+        </div>
+        <div class="phase">
+          <div class="ph-label">Phase 3 · 再决定</div>
+          <h4>评估旧域名首页</h4>
+          <p>只有当新 frontdoor 与两个 demo 都足够稳、能接住用户后，才考虑要不要把 `latindance.zondev.top` 首页切成新入口。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>接下来的 3 个交付</h2><span class="more">不是今天就切生产</span></div>
+      <div class="course-grid">
+        <div class="course-card">
+          <span class="status soon">当前优先</span>
+          <h4>Daily Latin 第二版</h4>
+          <p>把状态分流、起步任务、直播回流和 clip archive 做成更完整的入口链路。</p>
+        </div>
+        <div class="course-card">
+          <span class="status soon">当前优先</span>
+          <h4>Dance OS 第二版</h4>
+          <p>把 Session Lens、Correction Ledger、Body Map 和 Practice Queue 做成更像产品的操作界面。</p>
+        </div>
+        <div class="course-card">
+          <span class="status locked">条件达成后</span>
+          <h4>旧域名首页评估</h4>
+          <p>只有当新前台明显优于旧站时，才做首页切换；否则继续保留双轨。</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>LATINOS · 路线图</div>
+      <div>原则：先 preview，后 production</div>
+    </footer>
+</div>
+
+<div class="page" data-page="dashboard">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">状态看板</div>
+        <h1>先看结构闭环，不急着看流量</h1>
+      </div>
+      <div class="today-pill">截至 2026-07-05</div>
+    </div>
+
+    <section>
+      <div class="dash-grid">
+        <div class="dash-card"><div class="l">Legacy Site</div><div class="v">1</div><div class="d">Ready · live</div></div>
+        <div class="dash-card"><div class="l">Demo Tracks</div><div class="v">2</div><div class="d">Daily Latin / Dance OS</div></div>
+        <div class="dash-card"><div class="l">Feishu Docs</div><div class="v">3</div><div class="d">主来源已锁定</div></div>
+        <div class="dash-card"><div class="l">Preview Site</div><div class="v">1</div><div class="d">Vercel alias 已创建</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>结构推进条</h2></div>
+      <div class="heatmap-card">
+        <div class="bars" id="bars"></div>
+      </div>
+    </section>
+
+    <footer>
+      <div>LATINOS · 状态看板</div>
+      <div>当前优先级：先把前台和 demo 做稳</div>
+    </footer>
+</div>
+
+<div class="page" data-page="about">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">关于这条线</div>
+        <h1>这不是只做一个网站，而是在搭 Latin Dance OS</h1>
+      </div>
+      <div class="today-pill">project identity</div>
+    </div>
+
+    <div class="prose">
+      <p>这条线真正要解决的，不是“怎么做一个拉丁页面”，而是怎么把拉丁这件事组织成一个长期会越长越清晰的系统。飞书里已经很明确：这里至少有三条并行线——<b>Daily Latin IP</b>、<b>拉丁成长网站</b>、<b>Dance Tools / Dance OS</b>。</p>
+
+      <h3>四层目标</h3>
+      <p><b>保留 proof</b> —— 旧站已经是公开证据，不需要因为结构重做而抹掉。</p>
+      <p><b>重建入口</b> —— 新 frontdoor 负责把旧站、新 demo、来源文档和路线图收进同一个前台节奏里。</p>
+      <p><b>做成 demo</b> —— 不只是内容站，还要长出 Daily Latin 和 Dance OS 两条产品化分支。</p>
+      <p><b>未来再切 production</b> —— 域名切换不是第一步，是后面的结果。</p>
+
+      <h3>为什么强调 Feishu first</h3>
+      <p>因为真实工作内容已经在飞书里，继续让 Notion 和 Feishu 双轨并行，只会让结构再次变乱。这个仓库从今天开始只认飞书为主来源。</p>
+
+      <h3>今天最重要的事情</h3>
+      <p>不是争论“旧站要不要废掉”，也不是急着绑新域名，而是先把：<b>旧站保留</b>、<b>新入口可看</b>、<b>两个 demo 有位置</b>、<b>规则写清楚</b> 这四件事同时成立。</p>
+    </div>
+
+    <footer>
+      <div>LATINOS · About</div>
+      <div>一句话：Keep the proof. Build the next.</div>
+    </footer>
+</div>
+  </main>
+</div>
+
+<script>
+  const navButtons = document.querySelectorAll('.nav button[data-page]');
+  const pages = document.querySelectorAll('.page');
+  const pageKeys = new Set(Array.from(pages, (page) => page.dataset.page));
+
+  function showPage(key, options = {}){
+    const nextKey = pageKeys.has(key) ? key : 'home';
+    pages.forEach((page) => page.classList.toggle('active', page.dataset.page === nextKey));
+    navButtons.forEach((button) => button.classList.toggle('active', button.dataset.page === nextKey));
+    if (!options.skipHash) {
+      const nextHash = '#' + nextKey;
+      if (window.location.hash !== nextHash) {
+        window.history.replaceState(null, '', nextHash);
+      }
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function getPageFromHash(){
+    const key = window.location.hash.replace(/^#/, '');
+    return pageKeys.has(key) ? key : 'home';
+  }
+
+  document.querySelectorAll('button[data-page]').forEach((node) => {
+    node.addEventListener('click', () => showPage(node.dataset.page));
+  });
+
+  window.addEventListener('hashchange', () => {
+    showPage(getPageFromHash(), { skipHash: true });
+  });
+
+  showPage(getPageFromHash(), { skipHash: true });
+
+  const heatGrid = document.getElementById('heatGrid');
+  if (heatGrid) {
+    const progress = [
+      0,0,0,0,1,1,1,
+      0,0,1,1,1,1,2,
+      0,0,0,1,2,2,2,
+      0,0,0,1,1,2,3,
+      0,0,0,0,1,2,2,
+      0,0,0,0,1,2,3,
+      0,0,0,0,0,1,2,
+      0,0,0,0,0,1,1,
+      0,0,0,0,0,0,1,
+      0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0
+    ];
+    const colors = ['#222226', '#3A3A3F', '#6B5F78', '#9D6FE0'];
+    progress.forEach((value, index) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.style.background = colors[value];
+      cell.title = 'Week slot ' + (index + 1);
+      heatGrid.appendChild(cell);
+    });
+  }
+
+  const moveTabs = document.querySelectorAll('#moveTabs .tab');
+  moveTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      moveTabs.forEach((item) => item.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      document.querySelectorAll('#moveGrid .move-card').forEach((card) => {
+        card.style.display = filter === 'all' || card.dataset.category === filter ? '' : 'none';
+      });
+    });
+  });
+
+  const barsWrap = document.getElementById('bars');
+  if (barsWrap) {
+    const data = [
+      { label: '规则', value: 4 },
+      { label: '旧站', value: 5 },
+      { label: '飞书', value: 4 },
+      { label: '首页', value: 4 },
+      { label: 'Daily', value: 3 },
+      { label: 'OS', value: 3 },
+      { label: '域名', value: 2 }
+    ];
+    data.forEach((item) => {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = (item.value / 5 * 100) + '%';
+      bar.innerHTML = '<span>' + item.label + '</span>';
+      barsWrap.appendChild(bar);
+    });
+  }
+</script>
+</body>
+</html>
