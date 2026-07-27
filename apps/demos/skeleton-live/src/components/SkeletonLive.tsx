@@ -28,6 +28,14 @@ import {
   type ReferenceSample,
   type ReferenceSequence,
 } from '../lib/reference'
+import {
+  ASSUMED_FPS,
+  EXTRACT_STEP_FRAMES,
+  clearCachedReference,
+  loadCachedReference,
+  refCacheKey,
+  saveCachedReference,
+} from '../lib/refCache'
 import KeyPoseCard from './KeyPoseCard'
 
 type SourceType = 'camera' | 'video'
@@ -50,6 +58,12 @@ const COUNTDOWN_SECONDS = 3
 const SCORE_WINDOW_SEC = 0.5
 /** 关键动作得分的统计窗口(秒,围绕关键时刻) */
 const KEY_SCORE_RADIUS = 0.3
+
+/** 默认参考:public/references/ 下的示范视频 */
+const DEFAULT_REF_ID = 'references/58_raw.mp4'
+const DEFAULT_REF_URL = `${import.meta.env.BASE_URL}${DEFAULT_REF_ID}`
+const DEFAULT_REF_LABEL = '默认示范 58_raw'
+const EXTRACT_DT = EXTRACT_STEP_FRAMES / ASSUMED_FPS
 
 const ALL_PARTS: BodyPart[] = ['leftArm', 'rightArm', 'leftLeg', 'rightLeg', 'torso']
 
@@ -93,6 +107,13 @@ interface Countdown {
   endPerf: number
   label: string
   action: () => void
+}
+
+interface ExtractingState {
+  label: string
+  progress: number
+  eta: number | null
+  cancellable: boolean
 }
 
 interface HudState {
@@ -142,8 +163,12 @@ export default function SkeletonLive() {
   const partColorsRef = useRef<Record<BodyPart, string>>(neutralPartColors())
   const lastHudRef = useRef(0)
   const cancelExtractRef = useRef(false)
+  const extractingRef = useRef(false)
+  const extractingProgressRef = useRef(0)
+  const manualRefTouchedRef = useRef(false)
   const smootherRef = useRef(new PoseSmoother(SMOOTH_PRESETS.medium))
   const smoothLevelRef = useRef<SmoothLevel>('medium')
+  const modelTypeRef = useRef<ModelType>('lite')
   const keyPosesRef = useRef<KeyPose[]>([])
 
   const [modelType, setModelType] = useState<ModelType>('lite')
@@ -166,7 +191,9 @@ export default function SkeletonLive() {
   const [refSeq, setRefSeq] = useState<ReferenceSequence | null>(null)
   const [refName, setRefName] = useState('')
   const [refError, setRefError] = useState<string | null>(null)
-  const [extractProgress, setExtractProgress] = useState<number | null>(null)
+  const [extracting, setExtracting] = useState<ExtractingState | null>(null)
+  const [cacheNotice, setCacheNotice] = useState<string | null>(null)
+  const [followHint, setFollowHint] = useState<string | null>(null)
   const [keyPoses, setKeyPoses] = useState<KeyPose[]>([])
   const [followState, setFollowState] = useState<FollowState>('idle')
   const [recordState, setRecordState] = useState<RecordState>('idle')
@@ -185,6 +212,10 @@ export default function SkeletonLive() {
   useEffect(() => {
     keyPosesRef.current = keyPoses
   }, [keyPoses])
+
+  useEffect(() => {
+    modelTypeRef.current = modelType
+  }, [modelType])
 
   // 平滑档位切换
   useEffect(() => {
@@ -211,6 +242,7 @@ export default function SkeletonLive() {
     setModelStatus('loading')
     setModelError(null)
     smootherRef.current.reset()
+    cancelExtractRef.current = true // 切换模型时中止进行中的提取
     loadPoseLandmarker(modelType)
       .then(({ landmarker, delegate, modelSource: ms }) => {
         if (cancelled) {
@@ -283,104 +315,189 @@ export default function SkeletonLive() {
     }
   }, [source, resolution, fileUrl])
 
-  // ---------- 参考动作来源 ----------
+  // ---------- 参考动作 ----------
 
-  const applyNewReference = (seq: ReferenceSequence, name: string) => {
+  const notifyCache = (msg: string) => {
+    setCacheNotice(msg)
+    setTimeout(() => setCacheNotice(null), 4000)
+  }
+
+  const applyNewReference = (seq: ReferenceSequence, name: string, keys?: KeyPose[]) => {
     followRunRef.current = null
     countdownRef.current = null
     partColorsRef.current = neutralPartColors()
     setFollowState('idle')
     setKeyResults(null)
+    setFollowHint(null)
     setRefSeq(seq)
     setRefName(name)
     setRefError(null)
-    setKeyPoses(extractKeyPoses(seq))
+    setKeyPoses(keys ?? extractKeyPoses(seq))
   }
 
-  const extractFromVideoFile = async (file: File) => {
+  const setExtractingBoth = (s: ExtractingState | null) => {
+    extractingProgressRef.current = s?.progress ?? 0
+    setExtracting(s)
+  }
+
+  /** 逐帧 seek 提取(不等实时播放),与主循环共用 landmarker 但时间戳恒为 performance.now(),天然单调不冲突 */
+  const runExtraction = async (opts: {
+    url: string
+    label: string
+    cacheKey: string
+    revokeAfter?: boolean
+    cancellable: boolean
+  }): Promise<void> => {
     const landmarker = landmarkerRef.current
     const v = refVideoRef.current
     if (!landmarker || !v) {
       setRefError('模型还没加载好,请稍后再试。')
       return
     }
+    extractingRef.current = true
     cancelExtractRef.current = false
     setRefError(null)
-    setExtractProgress(0)
+    const startPerf = performance.now()
+    setExtractingBoth({ label: opts.label, progress: 0, eta: null, cancellable: opts.cancellable })
 
-    // 提取时就用当前档位的滤波器,存进序列的就是平滑后的数据
-    const extractSmoother =
+    const smoother =
       smoothLevelRef.current === 'off' ? null : new PoseSmoother(SMOOTH_PRESETS[smoothLevelRef.current])
 
-    const url = URL.createObjectURL(file)
-    v.src = url
-    v.muted = true
-    v.loop = false
+    const seekTo = (target: number) =>
+      new Promise<void>((resolve) => {
+        let done = false
+        const finish = () => {
+          if (!done) {
+            done = true
+            resolve()
+          }
+        }
+        v.addEventListener('seeked', finish, { once: true })
+        setTimeout(finish, 400)
+        v.currentTime = target
+      })
+
     try {
+      v.src = opts.url
+      v.muted = true
+      v.loop = false
+      v.preload = 'auto'
       await new Promise<void>((resolve, reject) => {
         v.onloadedmetadata = () => resolve()
         v.onerror = () => reject(new Error('视频文件无法解码'))
       })
-      await v.play()
-    } catch (e) {
-      setExtractProgress(null)
-      setRefError(e instanceof Error ? e.message : '视频加载失败')
-      URL.revokeObjectURL(url)
-      return
-    }
+      const duration = v.duration
+      if (!Number.isFinite(duration) || duration <= 0) throw new Error('无法读取视频时长')
 
-    const samples: ReferenceSample[] = []
-    let lastT = -1
-    await new Promise<void>((resolve) => {
-      const step = () => {
-        if (cancelExtractRef.current || v.ended) {
-          resolve()
-          return
+      const samples: ReferenceSample[] = []
+      let errStreak = 0
+      for (let t = 0; t < duration; t += EXTRACT_DT) {
+        if (cancelExtractRef.current) break
+        await seekTo(Math.min(t, duration - 0.05))
+        try {
+          const res = landmarker.detectForVideo(v, performance.now())
+          const lm = res.landmarks?.[0]
+          const ok = !!lm && bodyVisible(lm)
+          if (ok && smoother) smoother.filterLandmarks(lm, t)
+          samples.push({ t, ok, body: ok ? toBodyPose(lm) : emptyBodyPose() })
+          errStreak = 0
+        } catch {
+          errStreak += 1
+          if (errStreak > 20) throw new Error('提取被中断(模型可能已切换),请重新提取')
         }
-        if (v.readyState >= 2 && v.currentTime !== lastT) {
-          lastT = v.currentTime
-          try {
-            const res = landmarker.detectForVideo(v, performance.now())
-            const lm = res.landmarks?.[0]
-            const ok = !!lm && bodyVisible(lm)
-            if (ok && extractSmoother) {
-              extractSmoother.filterLandmarks(lm, v.currentTime)
-            }
-            samples.push({ t: v.currentTime, ok, body: ok ? toBodyPose(lm) : emptyBodyPose() })
-          } catch {
-            // 单帧失败跳过
-          }
-          setExtractProgress(v.duration ? Math.min(1, v.currentTime / v.duration) : 0)
+        if (samples.length % 10 === 0) {
+          const p = Math.min(1, t / duration)
+          const elapsed = (performance.now() - startPerf) / 1000
+          const eta = p > 0.03 ? (elapsed * (1 - p)) / p : null
+          setExtractingBoth({ label: opts.label, progress: p, eta, cancellable: opts.cancellable })
         }
-        requestAnimationFrame(step)
       }
-      requestAnimationFrame(step)
-    })
-
-    v.pause()
-    v.removeAttribute('src')
-    v.load()
-    URL.revokeObjectURL(url)
-    setExtractProgress(null)
-
-    if (cancelExtractRef.current) return
-    if (samples.filter((s) => s.ok).length < 5) {
-      setRefError('视频里没识别到完整身体,换一段全身出镜的示范视频试试。')
-      return
-    }
-    applyNewReference(
-      {
+      if (cancelExtractRef.current) return
+      if (samples.filter((s) => s.ok).length < 5) {
+        throw new Error('视频里没识别到完整身体,换一段全身出镜的示范视频试试。')
+      }
+      const seq: ReferenceSequence = {
         version: 1,
         createdAt: new Date().toISOString(),
-        source: file.name,
+        source: opts.label,
         duration: samples[samples.length - 1].t,
         samples,
-      },
-      file.name,
+      }
+      const keys = extractKeyPoses(seq)
+      if (!saveCachedReference(opts.cacheKey, seq, keys)) {
+        notifyCache('缓存空间不足,本次提取结果仅保留在内存中')
+      }
+      applyNewReference(seq, opts.label, keys)
+    } catch (e) {
+      if (!cancelExtractRef.current) {
+        setRefError(e instanceof Error ? e.message : '提取失败')
+      }
+    } finally {
+      v.pause()
+      v.removeAttribute('src')
+      v.load()
+      if (opts.revokeAfter) URL.revokeObjectURL(opts.url)
+      extractingRef.current = false
+      setExtractingBoth(null)
+    }
+  }
+
+  /** 默认参考:先查缓存,未命中后台提取;不阻塞用户先用摄像头 */
+  const ensureDefaultReference = async () => {
+    if (extractingRef.current || manualRefTouchedRef.current) return
+    if (!landmarkerRef.current) return
+    const cacheKey = refCacheKey(DEFAULT_REF_ID, smoothLevelRef.current, modelTypeRef.current)
+    const cached = loadCachedReference(cacheKey)
+    if (cached) {
+      applyNewReference(cached.seq, DEFAULT_REF_LABEL, cached.keyPoses)
+      notifyCache('默认参考已从本地缓存秒级载入')
+      return
+    }
+    await runExtraction({ url: DEFAULT_REF_URL, label: DEFAULT_REF_LABEL, cacheKey, cancellable: false })
+  }
+
+  /** 模型就绪后自动加载默认参考;换平滑档位时按新 key 重取(命中缓存则秒载) */
+  useEffect(() => {
+    if (modelStatus === 'ready' && !manualRefTouchedRef.current && !extractingRef.current) {
+      void ensureDefaultReference()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelStatus, smoothLevel])
+
+  const reExtractDefault = () => {
+    if (extractingRef.current) return
+    manualRefTouchedRef.current = false
+    clearCachedReference(refCacheKey(DEFAULT_REF_ID, smoothLevelRef.current, modelTypeRef.current))
+    void ensureDefaultReference()
+  }
+
+  const extractFromVideoFile = async (file: File) => {
+    manualRefTouchedRef.current = true
+    // 与进行中的提取共享同一个隐藏 video 元素,先取消并等其收尾
+    if (extractingRef.current) {
+      cancelExtractRef.current = true
+      const waitStart = performance.now()
+      while (extractingRef.current && performance.now() - waitStart < 3000) {
+        await new Promise((r) => setTimeout(r, 50))
+      }
+    }
+    const cacheKey = refCacheKey(
+      `file:${file.name}:${file.size}:${file.lastModified}`,
+      smoothLevelRef.current,
+      modelTypeRef.current,
     )
+    const cached = loadCachedReference(cacheKey)
+    if (cached) {
+      applyNewReference(cached.seq, file.name, cached.keyPoses)
+      notifyCache('该视频的参考已从本地缓存载入')
+      return
+    }
+    const url = URL.createObjectURL(file)
+    await runExtraction({ url, label: file.name, cacheKey, revokeAfter: true, cancellable: true })
   }
 
   const importRefJson = async (file: File) => {
+    manualRefTouchedRef.current = true
     try {
       const seq = parseSequence(await file.text())
       applyNewReference(seq, file.name)
@@ -409,6 +526,9 @@ export default function SkeletonLive() {
     setRefError(null)
     setKeyPoses([])
     setKeyResults(null)
+    // 清除后回到默认参考(通常命中缓存,秒级载入)
+    manualRefTouchedRef.current = false
+    void ensureDefaultReference()
   }
 
   // ---------- 录制 / 跟练 ----------
@@ -427,10 +547,19 @@ export default function SkeletonLive() {
   }
 
   const startFollow = () => {
-    if (!refSeqRef.current || recordState !== 'idle') return
+    if (!refSeqRef.current) {
+      if (extractingRef.current) {
+        const missing = Math.round((1 - extractingProgressRef.current) * 100)
+        setFollowHint(`参考提取中,还差 ${missing}%`)
+        setTimeout(() => setFollowHint(null), 3000)
+      }
+      return
+    }
+    if (recordState !== 'idle') return
     followRunRef.current = null
     partColorsRef.current = neutralPartColors()
     setKeyResults(null)
+    setFollowHint(null)
     setPanelOpen(false)
     countdownRef.current = {
       endPerf: performance.now() + COUNTDOWN_SECONDS * 1000,
@@ -522,6 +651,7 @@ export default function SkeletonLive() {
             setRecordState('idle')
             const good = rec.samples.filter((s) => s.ok).length
             if (good >= 5) {
+              manualRefTouchedRef.current = true
               applyNewReference(
                 {
                   version: 1,
@@ -1016,21 +1146,28 @@ export default function SkeletonLive() {
               {/* 参考动作 */}
               <div>
                 <p className="mb-1.5 text-xs text-neutral-500">参考动作(跟练打分)</p>
-                {extractProgress !== null ? (
+                {extracting ? (
                   <div className="mb-2 rounded-md bg-neutral-900 px-2 py-2 text-xs text-neutral-300">
-                    <div className="mb-1 flex items-center justify-between">
-                      <span>正在提取参考姿态… {Math.round(extractProgress * 100)}%</span>
-                      <button
-                        onClick={() => {
-                          cancelExtractRef.current = true
-                        }}
-                        className="text-red-400 hover:text-red-300"
-                      >
-                        取消
-                      </button>
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span>
+                        正在提取「{extracting.label}」… {Math.round(extracting.progress * 100)}%
+                        {extracting.eta !== null && extracting.eta > 0.5 && (
+                          <span className="text-neutral-500">(约剩 {Math.ceil(extracting.eta)}s)</span>
+                        )}
+                      </span>
+                      {extracting.cancellable && (
+                        <button
+                          onClick={() => {
+                            cancelExtractRef.current = true
+                          }}
+                          className="shrink-0 text-red-400 hover:text-red-300"
+                        >
+                          取消
+                        </button>
+                      )}
                     </div>
                     <div className="h-1 overflow-hidden rounded-full bg-neutral-800">
-                      <div className="h-full bg-emerald-400" style={{ width: `${extractProgress * 100}%` }} />
+                      <div className="h-full bg-emerald-400" style={{ width: `${extracting.progress * 100}%` }} />
                     </div>
                   </div>
                 ) : refSeq ? (
@@ -1042,6 +1179,7 @@ export default function SkeletonLive() {
                   <p className="mb-2 text-xs text-neutral-600">先录制 / 导入一个参考动作。</p>
                 )}
                 {refError && <p className="mb-2 text-xs text-red-400">{refError}</p>}
+                {cacheNotice && <p className="mb-2 text-[11px] text-emerald-400/80">{cacheNotice}</p>}
 
                 <div className="flex gap-2">
                   <label className={`${panelBtn} cursor-pointer text-center`}>
@@ -1100,6 +1238,14 @@ export default function SkeletonLive() {
                     </button>
                   </div>
                 )}
+                {!extracting && (
+                  <button
+                    onClick={reExtractDefault}
+                    className="mt-1.5 text-[11px] text-neutral-500 underline decoration-neutral-700 underline-offset-2 hover:text-neutral-300"
+                  >
+                    重新提取默认参考
+                  </button>
+                )}
               </div>
 
               {/* 跟练 */}
@@ -1115,12 +1261,13 @@ export default function SkeletonLive() {
                 ) : (
                   <button
                     onClick={startFollow}
-                    disabled={!refSeq || recordState !== 'idle'}
+                    disabled={(!refSeq && !extracting) || recordState !== 'idle'}
                     className="w-full rounded-md bg-emerald-500 px-3 py-2 text-sm font-medium text-black hover:bg-emerald-400 disabled:opacity-40"
                   >
                     开始跟练(3 秒倒计时)
                   </button>
                 )}
+                {followHint && <p className="mt-1.5 text-xs text-amber-300">{followHint}</p>}
                 <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">
                   骨架颜色 = 部位偏差:青绿 &lt;15°,黄 15–30°,红 &gt;30°;白色幽灵是参考动作,右侧卡片预告下一个关键动作。
                 </p>
