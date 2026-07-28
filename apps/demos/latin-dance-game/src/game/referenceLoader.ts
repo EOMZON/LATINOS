@@ -10,7 +10,7 @@ import {
   refCacheKey,
   saveCachedReference,
 } from '../lib/refCache'
-import { parseSequence, type ReferenceSample, type ReferenceSequence } from '../lib/reference'
+import { parseSequence, parseWorldSamples, worldSampleFrom, type ReferenceSample, type ReferenceSequence, type WorldSample } from '../lib/reference'
 import type { SilhouetteEntry, SilhouettePts } from '../lib/silhouette'
 
 const EXTRACT_DT = EXTRACT_STEP_FRAMES / ASSUMED_FPS
@@ -41,6 +41,8 @@ export interface LoadedReference {
   source: ReferenceSource
   /** 关键姿态剪影(format 2 预计算才有;缺省时渲染回退骨架卡) */
   silhouettes?: SilhouetteEntry[]
+  /** 3D world 平行采样(format 2 预计算 / 新缓存才有;髋扭转指示器的参考目标区) */
+  world?: WorldSample[]
 }
 
 /** 参考视频对应的预计算文件地址:references/58_raw.mp4 → references/58_raw.poses.json */
@@ -60,6 +62,7 @@ interface PrecomputedFile {
   seqJson?: unknown
   keyPoses?: unknown
   silhouettes?: unknown
+  world?: unknown
 }
 
 /** 校验并解析剪影数组(format 2);不合法返回 undefined(回退骨架渲染) */
@@ -175,6 +178,7 @@ async function tryLoadPrecomputed(opts: LoadRefOptions): Promise<LoadedReference
       keyPoses: keyPoses ?? extractKeyPoses(seq),
       source: 'precomputed',
       silhouettes: parseSilhouettes(raw.silhouettes),
+      world: parseWorldSamples(raw.world, seq.samples.length),
     }
   } catch {
     return null
@@ -218,6 +222,7 @@ async function doExtract(opts: LoadRefOptions, cacheKey: string): Promise<Loaded
     if (!Number.isFinite(duration) || duration <= 0) throw new Error('无法读取示范视频时长')
 
     const samples: ReferenceSample[] = []
+    const world: WorldSample[] = []
     let errStreak = 0
     for (let t = 0; t < duration; t += EXTRACT_DT) {
       await seekTo(Math.min(t, duration - 0.05))
@@ -227,6 +232,7 @@ async function doExtract(opts: LoadRefOptions, cacheKey: string): Promise<Loaded
         const ok = !!lm && bodyVisible(lm)
         if (ok && smoother) smoother.filterLandmarks(lm, t)
         samples.push({ t, ok, body: ok ? toBodyPose(lm) : emptyBodyPose() })
+        world.push(ok ? worldSampleFrom(res.worldLandmarks?.[0]) : null)
         errStreak = 0
       } catch {
         errStreak += 1
@@ -245,8 +251,8 @@ async function doExtract(opts: LoadRefOptions, cacheKey: string): Promise<Loaded
       samples,
     }
     const keyPoses = extractKeyPoses(seq)
-    saveCachedReference(cacheKey, seq, keyPoses) // 配额不足仅本次不缓存,不报错
-    return { seq, keyPoses, source: 'extracted' }
+    saveCachedReference(cacheKey, seq, keyPoses, world) // 配额不足仅本次不缓存,不报错
+    return { seq, keyPoses, source: 'extracted', world }
   } finally {
     v.pause()
     v.removeAttribute('src')

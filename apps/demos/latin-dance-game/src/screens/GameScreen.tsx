@@ -7,9 +7,15 @@ import {
   type BodyPart,
 } from '../lib/bodyPose'
 import { extractKeyPoses, type KeyPose } from '../lib/keyPoses'
-import type { ReferenceSequence } from '../lib/reference'
+import type { ReferenceSequence, WorldSample } from '../lib/reference'
+import {
+  FeatureSmoother,
+  featuresFromWorld,
+  featuresFromWorldSample,
+} from '../lib/danceFeatures'
 import { usePoseEngine } from '../game/engine'
 import { loadVideoReference } from '../game/referenceLoader'
+import { GameCoach, HIP_YAW_TOL_DEG } from '../game/coach'
 import {
   JUDGMENT_META,
   chapterStarsFor,
@@ -21,6 +27,7 @@ import { sfx } from '../game/audio'
 import {
   drawCameraFrame,
   drawGhost,
+  drawHipDial,
   drawLiveSkeleton,
   neutralPartColors,
   partColorsFromErr,
@@ -32,6 +39,7 @@ import { findSilhouette, type SilhouetteEntry } from '../lib/silhouette'
 import type { GameResult, KeyResult } from '../game/types'
 import SilhouetteFigure from '../components/SilhouetteFigure'
 import StatusBadge from '../components/StatusBadge'
+import { voice } from '../game/voice'
 
 const KEY_RADIUS = 0.3 // 判定窗口 ±0.3s
 const SCORE_WINDOW_SEC = 0.5
@@ -122,6 +130,12 @@ export default function GameScreen({
   const partColorsRef = useRef(neutralPartColors())
   const chapterCountRef = useRef(0)
   const fullDurationRef = useRef(0)
+  // 3D 特征:参考 world 采样(与全曲 samples 平行)+ 章节起始偏移
+  const worldRef = useRef<WorldSample[] | null>(null)
+  const worldOffsetRef = useRef(0)
+  const featSmootherRef = useRef(new FeatureSmoother())
+  const coachRef = useRef(new GameCoach())
+  const partErrRef = useRef<Record<BodyPart, number> | null>(null)
 
   phaseRef.current = phase
 
@@ -153,6 +167,11 @@ export default function GameScreen({
         if (r.silhouettes) setSilhouettes(r.silhouettes)
         chapterCountRef.current = splitChapters(r.seq.duration).length
         fullDurationRef.current = r.seq.duration
+        // world 采样与全曲 samples 平行;章节模式记录起始偏移
+        worldRef.current = r.world ?? null
+        worldOffsetRef.current = chapter
+          ? Math.max(0, r.seq.samples.findIndex((s) => s.t >= chapter.start))
+          : 0
         const sliced = chapter ? sliceSequence(r.seq, chapter) : r
         seqRef.current = sliced.seq
         keysRef.current = sliced.keyPoses
@@ -259,6 +278,9 @@ export default function GameScreen({
             keyResults: [],
           }
           partColorsRef.current = neutralPartColors()
+          featSmootherRef.current.reset()
+          coachRef.current.reset()
+          partErrRef.current = null
           setPhase('running')
         } else {
           ctx.fillStyle = 'rgba(0,0,0,0.35)'
@@ -316,6 +338,7 @@ export default function GameScreen({
           avgErr[part] = run.window.reduce((s, x) => s + x.partErr[part], 0) / nWin
         }
         partColorsRef.current = partColorsFromErr(avgErr)
+        partErrRef.current = avgErr
         const keys = keysRef.current
         for (let ki = 0; ki < keys.length; ki++) {
           if (Math.abs(keys[ki].t - t) <= KEY_RADIUS) {
@@ -327,6 +350,7 @@ export default function GameScreen({
         run.frame = null
         run.lowVis = !visible
         partColorsRef.current = neutralPartColors()
+        partErrRef.current = null
       }
 
       // 关键动作判定落锤
@@ -358,6 +382,32 @@ export default function GameScreen({
       // 绘制:幽灵 + 实时骨骼
       if (sample.ok) drawGhost(ctx, sample.body, lm, w, h)
       if (lm) drawLiveSkeleton(ctx, lm, w, h, partColorsRef.current)
+
+      // 3D 特征:胯部俯视盘 + 重心脚 + 教练播报
+      {
+        const rawFeat = featuresFromWorld(engine.worldLandmarksRef.current)
+        const liveFeat = rawFeat ? featSmootherRef.current.push(rawFeat) : null
+        const world = worldRef.current
+        const ws = world ? world[worldOffsetRef.current + run.sampleIdx] ?? null : null
+        const refFeat = featuresFromWorldSample(ws)
+        drawHipDial(
+          ctx,
+          w * 0.085,
+          h * 0.68,
+          Math.max(30, h * 0.075),
+          liveFeat,
+          refFeat?.hipYawDeg ?? null,
+          refFeat?.weightFoot ?? null,
+          HIP_YAW_TOL_DEG,
+          cssVar('--accent', '#c084fc'),
+        )
+        coachRef.current.tick({
+          live: liveFeat,
+          refHipYawDeg: refFeat?.hipYawDeg ?? null,
+          refWeightFoot: refFeat?.weightFoot ?? null,
+          partErrDeg: partErrRef.current,
+        })
+      }
 
       // HUD 节流同步
       if (now - lastHudSync > 100) {
@@ -414,6 +464,9 @@ export default function GameScreen({
     const timer = setTimeout(() => setPopup(null), 900)
     return () => clearTimeout(timer)
   }, [popup])
+
+  // 离开游戏时停掉教练播报
+  useEffect(() => () => voice.stop(), [])
 
   const keys = keysRef.current
   const seq = seqRef.current

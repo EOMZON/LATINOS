@@ -1,5 +1,5 @@
 import { extractKeyPoses, type KeyPose } from './keyPoses'
-import { parseSequence, sequenceToJson, type ReferenceSequence } from './reference'
+import { parseSequence, parseWorldSamples, sequenceToJson, type ReferenceSequence, type WorldSample } from './reference'
 
 /** 提取步长(每 2 帧采一次,按 30fps 估算) */
 export const EXTRACT_STEP_FRAMES = 2
@@ -23,6 +23,8 @@ export function refCacheKey(
 export interface CachedReference {
   seq: ReferenceSequence
   keyPoses: KeyPose[]
+  /** 3D world 平行采样(旧缓存没有则 undefined,指示器只显示实时侧) */
+  world?: WorldSample[]
 }
 
 /** 命中返回序列 + 关键姿态;未命中或数据损坏返回 null */
@@ -30,7 +32,12 @@ export function loadCachedReference(key: string): CachedReference | null {
   try {
     const text = localStorage.getItem(key)
     if (!text) return null
-    const raw = JSON.parse(text) as { cacheVersion?: unknown; seqJson?: unknown; keyPoses?: unknown }
+    const raw = JSON.parse(text) as {
+      cacheVersion?: unknown
+      seqJson?: unknown
+      keyPoses?: unknown
+      world?: unknown
+    }
     if (raw.cacheVersion !== 1 || !raw.seqJson) return null
     // 复用导出格式的校验逻辑
     const seq = parseSequence(JSON.stringify(raw.seqJson))
@@ -41,14 +48,23 @@ export function loadCachedReference(key: string): CachedReference | null {
         keyPoses = ks.map((k) => ({ t: k.t as number, index: k.index as number, energy: Number(k.energy) || 0 }))
       }
     }
-    return { seq, keyPoses: keyPoses ?? extractKeyPoses(seq) }
+    return {
+      seq,
+      keyPoses: keyPoses ?? extractKeyPoses(seq),
+      world: parseWorldSamples(raw.world, seq.samples.length),
+    }
   } catch {
     return null
   }
 }
 
 /** 写入缓存;配额不足等失败返回 false(调用方降级为仅内存) */
-export function saveCachedReference(key: string, seq: ReferenceSequence, keyPoses: KeyPose[]): boolean {
+export function saveCachedReference(
+  key: string,
+  seq: ReferenceSequence,
+  keyPoses: KeyPose[],
+  world?: WorldSample[],
+): boolean {
   try {
     localStorage.setItem(
       key,
@@ -56,6 +72,7 @@ export function saveCachedReference(key: string, seq: ReferenceSequence, keyPose
         cacheVersion: 1,
         seqJson: JSON.parse(sequenceToJson(seq)),
         keyPoses,
+        world,
       }),
     )
     return true

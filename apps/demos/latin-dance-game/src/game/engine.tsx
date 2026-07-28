@@ -32,6 +32,8 @@ export interface PoseEngine {
   videoRef: RefObject<HTMLVideoElement | null>
   /** 当前帧(已 One Euro 平滑)的身体关键点,未识别时为 null */
   landmarksRef: RefObject<NormalizedLandmark[] | null>
+  /** 当前帧 3D world landmarks(米制、髋原点,未平滑;无识别为 null) */
+  worldLandmarksRef: RefObject<NormalizedLandmark[] | null>
   status: EngineStatus
   smoothLevel: SmoothLevel
   setSmoothLevel: (l: SmoothLevel) => void
@@ -69,6 +71,7 @@ function cameraErrorMessage(err: unknown): string {
 export function PoseEngineProvider({ children }: { children: ReactNode }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const landmarksRef = useRef<NormalizedLandmark[] | null>(null)
+  const worldLandmarksRef = useRef<NormalizedLandmark[] | null>(null)
   const landmarkerRef = useRef<PoseLandmarker | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const smootherRef = useRef(new PoseSmoother(SMOOTH_PRESETS.medium))
@@ -167,6 +170,7 @@ export function PoseEngineProvider({ children }: { children: ReactNode }) {
     const video = videoRef.current
     if (video) video.srcObject = null
     landmarksRef.current = null
+    worldLandmarksRef.current = null
     patchStatus({ cameraActive: false })
   }, [patchStatus])
 
@@ -188,6 +192,7 @@ export function PoseEngineProvider({ children }: { children: ReactNode }) {
           smootherRef.current.filterLandmarks(lm, performance.now() / 1000)
         }
         landmarksRef.current = lm
+        worldLandmarksRef.current = res.worldLandmarks?.[0] ?? null
         inferCountRef.current += 1
       } catch {
         // 单帧推理失败沿用上一帧
@@ -209,6 +214,7 @@ export function PoseEngineProvider({ children }: { children: ReactNode }) {
   const engine: PoseEngine = {
     videoRef,
     landmarksRef,
+    worldLandmarksRef,
     status,
     smoothLevel,
     setSmoothLevel,

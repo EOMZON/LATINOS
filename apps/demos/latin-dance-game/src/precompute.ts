@@ -8,7 +8,7 @@ import { loadPoseLandmarker } from './lib/pose'
 import { PoseSmoother, SMOOTH_PRESETS } from './lib/oneEuroFilter'
 import { bodyVisible, emptyBodyPose, toBodyPose } from './lib/bodyPose'
 import { extractKeyPoses } from './lib/keyPoses'
-import { sequenceToJson, type ReferenceSample, type ReferenceSequence } from './lib/reference'
+import { sequenceToJson, worldSampleFrom, type ReferenceSample, type ReferenceSequence, type WorldSample } from './lib/reference'
 import { ASSUMED_FPS, EXTRACT_STEP_FRAMES } from './lib/refCache'
 import { loadImageSegmenter, maskToPolygon, type SilhouettePts } from './lib/silhouette'
 
@@ -67,6 +67,7 @@ async function runExtraction(videoUrl: string, videoId: string): Promise<unknown
     if (!Number.isFinite(duration) || duration <= 0) throw new Error('无法读取视频时长')
 
     const samples: ReferenceSample[] = []
+    const world: WorldSample[] = []
     for (let t = 0; t < duration; t += EXTRACT_DT) {
       await seekTo(Math.min(t, duration - 0.05))
       const res = landmarker.detectForVideo(v, performance.now())
@@ -74,6 +75,7 @@ async function runExtraction(videoUrl: string, videoId: string): Promise<unknown
       const ok = !!lm && bodyVisible(lm)
       if (ok && lm) smoother.filterLandmarks(lm, t)
       samples.push({ t, ok, body: ok && lm ? toBodyPose(lm) : emptyBodyPose() })
+      world.push(ok ? worldSampleFrom(res.worldLandmarks?.[0]) : null)
     }
     if (samples.filter((s) => s.ok).length < 5) {
       throw new Error('视频里没识别到完整身体')
@@ -143,11 +145,13 @@ async function runExtraction(videoUrl: string, videoId: string): Promise<unknown
         okFrames: samples.filter((s) => s.ok).length,
         keyPoseCount: keyPoses.length,
         silhouetteCount: silhouettes.filter(Boolean).length,
+        worldFrames: world.filter(Boolean).length,
         extractedAt: seq.createdAt,
       },
       seqJson: JSON.parse(sequenceToJson(seq)),
       keyPoses,
       silhouettes,
+      world,
     }
   } finally {
     v.pause()

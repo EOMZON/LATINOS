@@ -2,11 +2,13 @@ import type { NormalizedLandmark } from '@mediapipe/tasks-vision'
 import {
   BODY_CONNECTIONS,
   COLOR_GOOD,
+  COLOR_WARN,
   connectionPart,
   partColor,
   type BodyPart,
   type BodyPose,
 } from '../lib/bodyPose'
+import type { DanceFeatures } from '../lib/danceFeatures'
 
 /** 画布绘制工具:只画身体骨骼,不画面部 */
 
@@ -115,6 +117,122 @@ export function drawBodyPoseFigure(
     ctx.lineTo(cx + m * b.x * scale, cy + b.y * scale)
     ctx.stroke()
   }
+}
+
+/**
+ * 胯部俯视仪表盘:半圆刻度盘显示髋线朝向(0° = 正对镜头)。
+ * - 有参考时画目标扇区(accent 半透明),实时指针在区内变绿、区外变黄;
+ * - 底部两个圆点是重心脚(镜像显示:解剖学左脚画在屏幕右侧,和镜像画面一致);
+ * - 参考缺 world 数据时只画实时指针。
+ * 画在主画布上,调用方给圆心和半径。
+ */
+export function drawHipDial(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  r: number,
+  live: DanceFeatures | null,
+  refHipYawDeg: number | null,
+  refWeightFoot: 'left' | 'right' | 'both' | null,
+  tolDeg: number,
+  accent: string,
+) {
+  ctx.save()
+  ctx.translate(cx, cy)
+
+  // 底盘(上半圆,-90°..+90°;屏幕正上方 = 0° 正对镜头)
+  ctx.beginPath()
+  ctx.arc(0, 0, r, Math.PI, 2 * Math.PI)
+  ctx.closePath()
+  ctx.fillStyle = 'rgba(0,0,0,0.55)'
+  ctx.fill()
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)'
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+
+  // 角度 → 画布弧度:0° 指向正上(-90°),镜像显示(解剖学右转 = 屏幕左偏)
+  const toRad = (deg: number) => (-90 - deg) * (Math.PI / 180)
+
+  // 目标扇区
+  if (refHipYawDeg !== null) {
+    const a0 = toRad(refHipYawDeg - tolDeg)
+    const a1 = toRad(refHipYawDeg + tolDeg)
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.arc(0, 0, r * 0.92, Math.min(a0, a1), Math.max(a0, a1))
+    ctx.closePath()
+    ctx.fillStyle = `${accent}55`
+    ctx.fill()
+    // 目标中线
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.lineTo(Math.cos(toRad(refHipYawDeg)) * r * 0.92, Math.sin(toRad(refHipYawDeg)) * r * 0.92)
+    ctx.strokeStyle = accent
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+  }
+
+  // 中央刻度(0°)
+  ctx.beginPath()
+  ctx.moveTo(0, -r)
+  ctx.lineTo(0, -r * 0.86)
+  ctx.strokeStyle = 'rgba(255,255,255,0.4)'
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+
+  // 实时指针
+  if (live) {
+    const inZone = refHipYawDeg === null || Math.abs(live.hipYawDeg - refHipYawDeg) <= tolDeg
+    const a = toRad(live.hipYawDeg)
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.lineTo(Math.cos(a) * r * 0.8, Math.sin(a) * r * 0.8)
+    ctx.strokeStyle = inZone ? COLOR_GOOD : COLOR_WARN
+    ctx.lineWidth = 3
+    ctx.lineCap = 'round'
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.arc(0, 0, 3.5, 0, Math.PI * 2)
+    ctx.fillStyle = inZone ? COLOR_GOOD : COLOR_WARN
+    ctx.fill()
+  }
+
+  // 标签
+  ctx.fillStyle = 'rgba(255,255,255,0.75)'
+  ctx.font = `${Math.max(9, r * 0.22)}px sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'top'
+  ctx.fillText('胯', 0, -r * 0.62)
+
+  // 重心脚圆点(镜像:解剖学左脚在屏幕右)
+  if (live) {
+    const dotY = r * 0.38
+    const dotR = Math.max(4, r * 0.13)
+    const feet: Array<{ foot: 'left' | 'right'; x: number; label: string }> = [
+      { foot: 'right', x: -r * 0.42, label: '右' },
+      { foot: 'left', x: r * 0.42, label: '左' },
+    ]
+    for (const f of feet) {
+      const liveOn = live.weightFoot === f.foot || live.weightFoot === 'both'
+      const refOn = refWeightFoot !== null && (refWeightFoot === f.foot || refWeightFoot === 'both')
+      ctx.beginPath()
+      ctx.arc(f.x, dotY, dotR, 0, Math.PI * 2)
+      ctx.fillStyle = liveOn ? COLOR_GOOD : 'rgba(255,255,255,0.15)'
+      ctx.fill()
+      // 参考要求承重的脚:描 accent 圈
+      if (refOn) {
+        ctx.strokeStyle = accent
+        ctx.lineWidth = 2
+        ctx.stroke()
+      }
+      ctx.fillStyle = liveOn ? '#04252b' : 'rgba(255,255,255,0.55)'
+      ctx.font = `bold ${dotR * 1.1}px sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(f.label, f.x, dotY + 0.5)
+    }
+  }
+  ctx.restore()
 }
 
 /** 幽灵骨架:贴着用户髋部位置画的参考动作 */
