@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // 换肤防闪烁:渲染前从 localStorage 恢复 skin(默认 esports)
+      try {
+        document.documentElement.dataset.skin =
+          localStorage.getItem('latin-dance-game:skin') || 'esports'
+      } catch (e) {
+        document.documentElement.dataset.skin = 'esports'
+      }
+    </script>
+    <title>Latin Fever · 拉丁舞动</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,343 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.625rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    background: var(--bg);
+    color: var(--tx);
+  }
+}
+
+/* ============================================================
+   视觉风格 token:一套 skin = 一组 [data-skin] 变量
+   判定色(PERFECT 金 / GREAT·GOOD 绿青 / MISS 红)是功能色,
+   定义在 src/game/judgments.ts,三套 skin 下保持一致,不在此换肤。
+   ============================================================ */
+
+/* ① 深紫电竞(默认):深灰近黑底 + 饱和紫 + 霓虹高光 */
+:root,
+[data-skin='esports'] {
+  --bg: #0b0714;
+  --card: #150c26;
+  --card2: #1d1233;
+  --border: #2d1d4d;
+  --tx: #f3efff;
+  --tx-dim: rgba(233, 225, 255, 0.62);
+  --tx-faint: rgba(233, 225, 255, 0.38);
+  --primary: #a855f7;
+  --accent: #c084fc;
+  --accent-soft: rgba(168, 85, 247, 0.16);
+  --btn-grad: linear-gradient(100deg, #c084fc, #8b5cf6 55%, #7c3aed);
+  --btn-tx: #ffffff;
+  --title-grad: linear-gradient(100deg, #e9d5ff, #a855f7 55%, #7c3aed);
+  --glow: rgba(168, 85, 247, 0.45);
+  --chip-bg: #241640;
+  --star: #f5c542;
+  --progress-grad: linear-gradient(90deg, #a855f7, #c084fc);
+  --ambient:
+    radial-gradient(900px 420px at 50% -12%, rgba(168, 85, 247, 0.14), transparent 65%),
+    repeating-linear-gradient(0deg, rgba(168, 85, 247, 0.045) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(90deg, rgba(168, 85, 247, 0.045) 0 1px, transparent 1px 44px);
+}
+
+/* ② 浅紫简约:近白淡紫灰底 + 紫主色 + 大留白 */
+[data-skin='light'] {
+  --bg: #f7f5fc;
+  --card: #ffffff;
+  --card2: #f0ebfa;
+  --border: #e2d8f5;
+  --tx: #241335;
+  --tx-dim: rgba(36, 19, 53, 0.62);
+  --tx-faint: rgba(36, 19, 53, 0.4);
+  --primary: #7c3aed;
+  --accent: #8b5cf6;
+  --accent-soft: rgba(124, 58, 237, 0.1);
+  --btn-grad: linear-gradient(100deg, #8b5cf6, #7c3aed);
+  --btn-tx: #ffffff;
+  --title-grad: linear-gradient(100deg, #6d28d9, #8b5cf6);
+  --glow: rgba(124, 58, 237, 0.22);
+  --chip-bg: #ede7fa;
+  --star: #d97706;
+  --progress-grad: linear-gradient(90deg, #7c3aed, #a78bfa);
+  --ambient: radial-gradient(1000px 520px at 65% -15%, rgba(139, 92, 246, 0.1), transparent 62%);
+}
+
+/* ③ 紫金舞台:深底 + 紫主色 + 金色聚光点缀 */
+[data-skin='stage'] {
+  --bg: #120a1c;
+  --card: #1b1029;
+  --card2: #251639;
+  --border: #3a2457;
+  --tx: #f5efff;
+  --tx-dim: rgba(240, 230, 255, 0.62);
+  --tx-faint: rgba(240, 230, 255, 0.38);
+  --primary: #9333ea;
+  --accent: #f5c542;
+  --accent-soft: rgba(245, 197, 66, 0.14);
+  --btn-grad: linear-gradient(100deg, #a855f7, #7c3aed);
+  --btn-tx: #ffffff;
+  --title-grad: linear-gradient(100deg, #f0d58a, #c084fc 55%, #9333ea);
+  --glow: rgba(147, 51, 234, 0.4);
+  --chip-bg: #2b1a45;
+  --star: #f5c542;
+  --progress-grad: linear-gradient(90deg, #9333ea, #f5c542);
+  --ambient:
+    radial-gradient(760px 340px at 50% -10%, rgba(245, 197, 66, 0.16), transparent 66%),
+    radial-gradient(1100px 620px at 50% 125%, rgba(126, 34, 206, 0.22), transparent 62%);
+}
+
+/* ---------- 语义类(各屏统一使用,换肤即整体换装) ---------- */
+
+/* 场景底:固定铺底 + 各主题克制的氛围层(网格 / 柔光 / 聚光) */
+.sk-scene {
+  background: var(--bg);
+}
+.sk-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--ambient);
+}
+
+.sk-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.sk-card2 {
+  background: var(--card2);
+  border: 1px solid var(--border);
+}
+.sk-hover {
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.sk-hover:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 28px var(--glow);
+}
+
+.sk-btn {
+  background: var(--btn-grad);
+  color: var(--btn-tx);
+  box-shadow: 0 0 32px var(--glow);
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+.sk-btn:hover {
+  transform: scale(1.02);
+  filter: brightness(1.08);
+}
+.sk-btn:active {
+  transform: scale(0.97);
+}
+.sk-btn:disabled {
+  opacity: 0.4;
+  transform: none;
+  filter: none;
+}
+
+.sk-ghost {
+  background: var(--accent-soft);
+  color: var(--tx-dim);
+  transition: background 0.15s ease;
+}
+.sk-ghost:hover {
+  background: var(--chip-bg);
+  color: var(--tx);
+}
+
+.sk-title {
+  background: var(--title-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.sk-accent {
+  color: var(--accent);
+}
+.sk-dim {
+  color: var(--tx-dim);
+}
+.sk-faint {
+  color: var(--tx-faint);
+}
+.sk-star {
+  color: var(--star);
+}
+.sk-star-off {
+  color: var(--tx-faint);
+}
+
+.sk-chip {
+  background: var(--chip-bg);
+  color: var(--tx-dim);
+}
+.sk-chip-active {
+  background: var(--primary);
+  color: var(--btn-tx);
+}
+
+/* 泳道卡片 */
+.sk-lane {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.sk-lane-active {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 24px var(--glow);
+}
+
+/* 进度条 */
+.sk-track {
+  background: var(--chip-bg);
+}
+.sk-fill {
+  background: var(--progress-grad);
+}
+
+/* 连击胶囊 */
+.sk-combo {
+  background: var(--primary);
+  color: var(--btn-tx);
+  box-shadow: 0 0 20px var(--glow);
+}
+
+/* 皮肤切换器 */
+.skin-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.skin-card:hover {
+  transform: translateY(-2px);
+}
+.skin-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 22px var(--glow);
+}
+.skin-seg {
+  background: var(--chip-bg);
+  color: var(--tx-dim);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.skin-seg.active {
+  background: var(--primary);
+  color: var(--btn-tx);
+}
+
+/* Just Dance 式判定弹字动画 */
+@keyframes judgment-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.05) translateY(-10px);
+    opacity: 0;
+  }
+}
+
+.judgment-pop {
+  animation: judgment-pop 0.9s ease-out forwards;
+}
+
+/* 泳道卡片滑入 */
+@keyframes lane-slide {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.lane-card {
+  animation: lane-slide 0.35s ease-out;
+}
