@@ -39,6 +39,14 @@ import { findSilhouette, type SilhouetteEntry } from '../lib/silhouette'
 import type { GameResult, KeyResult } from '../game/types'
 import SilhouetteFigure from '../components/SilhouetteFigure'
 import StatusBadge from '../components/StatusBadge'
+import MuscleFigure from '../components/MuscleFigure'
+import {
+  activationFromRef,
+  baselineActivation,
+  readMuscleMapEnabled,
+  saveMuscleMapEnabled,
+  type MuscleActivation,
+} from '../game/muscleMap'
 import { voice } from '../game/voice'
 
 const KEY_RADIUS = 0.3 // 判定窗口 ±0.3s
@@ -136,6 +144,11 @@ export default function GameScreen({
   const featSmootherRef = useRef(new FeatureSmoother())
   const coachRef = useRef(new GameCoach())
   const partErrRef = useRef<Record<BodyPart, number> | null>(null)
+  // 肌肉发力地图 L1(标注驱动):参考特征 → 目标发力
+  const [muscleOn, setMuscleOn] = useState(readMuscleMapEnabled())
+  const [activation, setActivation] = useState<MuscleActivation>(baselineActivation())
+  const activationRef = useRef<MuscleActivation>(baselineActivation())
+  const prevRefYawRef = useRef<{ t: number; yaw: number } | null>(null)
 
   phaseRef.current = phase
 
@@ -407,6 +420,16 @@ export default function GameScreen({
           refWeightFoot: refFeat?.weightFoot ?? null,
           partErrDeg: partErrRef.current,
         })
+
+        // 发力地图:参考特征 → 目标发力(帧差算髋角速度)
+        if (refFeat) {
+          const prev = prevRefYawRef.current
+          const vel = prev && t > prev.t ? (refFeat.hipYawDeg - prev.yaw) / (t - prev.t) : 0
+          prevRefYawRef.current = { t, yaw: refFeat.hipYawDeg }
+          activationRef.current = activationFromRef(refFeat.hipYawDeg, vel, refFeat.weightFoot)
+        } else {
+          activationRef.current = baselineActivation()
+        }
       }
 
       // HUD 节流同步
@@ -428,6 +451,7 @@ export default function GameScreen({
           nextIdx,
           remain: nextIdx < keys.length ? Math.max(0, keys[nextIdx].t - t) : 0,
         })
+        setActivation(activationRef.current)
       }
     }
 
@@ -503,6 +527,19 @@ export default function GameScreen({
             >
               {phase === 'paused' ? '▶ 继续' : '⏸ 暂停'}
             </button>
+            <button
+              onClick={() => {
+                const v = !muscleOn
+                setMuscleOn(v)
+                saveMuscleMapEnabled(v)
+              }}
+              className={`rounded-full px-3 py-2 text-xs backdrop-blur ${
+                muscleOn ? 'sk-ghost' : 'bg-black/60 text-white/80 hover:bg-black/80'
+              }`}
+              title="肌肉发力地图 · 教学标注"
+            >
+              {muscleOn ? '🟥 发力地图' : '○ 发力地图'}
+            </button>
           </div>
         ) : (
           <div className="w-10" />
@@ -531,6 +568,17 @@ export default function GameScreen({
               未识别到完整身体,退后一点
             </div>
           )}
+        </div>
+      )}
+
+      {/* 肌肉发力地图 L1(标注驱动):该动作该用哪里发力 */}
+      {muscleOn && (phase === 'running' || phase === 'paused') && (
+        <div className="absolute right-3 top-1/2 w-[104px] -translate-y-1/2 rounded-2xl bg-black/55 p-2 backdrop-blur sm:right-5 sm:w-[130px]">
+          <p className="text-center text-[10px] font-bold text-white/80">发力地图</p>
+          <MuscleFigure activation={activation} className="mt-1" />
+          <p className="mt-1 text-center text-[8px] leading-tight text-white/35">
+            教学标注 · 非实时肌电
+          </p>
         </div>
       )}
 
