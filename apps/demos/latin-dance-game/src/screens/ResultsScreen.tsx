@@ -1,8 +1,11 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { JUDGMENT_META, RATING_COLORS, ratingFor, starsFor } from '../game/judgments'
 import type { ChapterDef, ModeDef } from '../modes/registry'
 import type { GameResult } from '../game/types'
 import { sfx } from '../game/audio'
+import { loadSilhouettesOnly } from '../game/referenceLoader'
+import { findSilhouette, type SilhouetteEntry } from '../lib/silhouette'
+import SilhouetteFigure from '../components/SilhouetteFigure'
 
 function fmtTime(t: number): string {
   return `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`
@@ -26,6 +29,23 @@ export default function ResultsScreen({
 }) {
   const rating = ratingFor(result.avg)
   const stars = starsFor(result.avg)
+  const [silhouettes, setSilhouettes] = useState<SilhouetteEntry[] | null>(null)
+
+  // 最好/最差动作的剪影快照:轻量补载预计算轮廓,没有就保持纯文本(不报错)
+  useEffect(() => {
+    let cancelled = false
+    if (mode.referenceId) {
+      void loadSilhouettesOnly(mode.referenceId).then((s) => {
+        if (!cancelled && s) setSilhouettes(s)
+      })
+    }
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  // 章节模式 keyResults 的时间是重定时的,查剪影要加回章节起点
+  const tOffset = chapter?.start ?? 0
 
   useEffect(() => {
     if (!result.failed) sfx.pass()
@@ -117,23 +137,35 @@ export default function ResultsScreen({
               <p className="mb-2 text-sm font-bold" style={{ color: '#2dffc4' }}>
                 做得最好的动作
               </p>
-              {best.map((k) => (
-                <p key={`b${k.t}`} className="sk-dim flex justify-between text-sm">
-                  <span>{fmtTime(k.t)}</span>
-                  <span className="tabular-nums">{k.avg !== null ? `${Math.round(k.avg)} 分` : '未入镜'}</span>
-                </p>
-              ))}
+              {best.map((k) => {
+                const pts = findSilhouette(silhouettes, k.t + tOffset)
+                return (
+                  <p key={`b${k.t}`} className="sk-dim flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-2">
+                      {pts && <SilhouetteFigure pts={pts} width={22} height={30} color="#2dffc4" />}
+                      {fmtTime(k.t)}
+                    </span>
+                    <span className="tabular-nums">{k.avg !== null ? `${Math.round(k.avg)} 分` : '未入镜'}</span>
+                  </p>
+                )
+              })}
             </div>
             <div className="sk-card2 rounded-2xl p-4">
               <p className="mb-2 text-sm font-bold" style={{ color: '#ff4d5e' }}>
                 最需要练的动作
               </p>
-              {worst.map((k) => (
-                <p key={`w${k.t}`} className="sk-dim flex justify-between text-sm">
-                  <span>{fmtTime(k.t)}</span>
-                  <span className="tabular-nums">{k.avg !== null ? `${Math.round(k.avg)} 分` : '未入镜'}</span>
-                </p>
-              ))}
+              {worst.map((k) => {
+                const pts = findSilhouette(silhouettes, k.t + tOffset)
+                return (
+                  <p key={`w${k.t}`} className="sk-dim flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-2">
+                      {pts && <SilhouetteFigure pts={pts} width={22} height={30} color="#ff4d5e" />}
+                      {fmtTime(k.t)}
+                    </span>
+                    <span className="tabular-nums">{k.avg !== null ? `${Math.round(k.avg)} 分` : '未入镜'}</span>
+                  </p>
+                )
+              })}
             </div>
           </div>
         )}

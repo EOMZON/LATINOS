@@ -107,7 +107,7 @@ try {
       )
 
       // 结构校验
-      if (!result || result.format !== 1) throw new Error('返回格式不正确')
+      if (!result || (result.format !== 1 && result.format !== 2)) throw new Error('返回格式不正确')
       if (!result.seqJson || !Array.isArray(result.seqJson.samples) || result.seqJson.samples.length < 5) {
         throw new Error('姿态序列不完整')
       }
@@ -123,7 +123,8 @@ try {
       const elapsed = ((Date.now() - t0) / 1000).toFixed(1)
       console.log(
         `  ✓ ${outName}  时长 ${result.meta.duration.toFixed(1)}s · ${result.meta.frames} 帧 · ` +
-          `关键姿态 ${result.meta.keyPoseCount} 个 · ${sizeKb} KB · 耗时 ${elapsed}s`,
+          `关键姿态 ${result.meta.keyPoseCount} 个 · 剪影 ${result.meta.silhouetteCount ?? 0} 个 · ` +
+          `${sizeKb} KB · 耗时 ${elapsed}s`,
       )
       okCount += 1
     } finally {

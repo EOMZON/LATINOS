@@ -17,15 +17,16 @@ npm run build                # 生产构建(tsc -b && vite build)
 npm run precompute           # 离线预提取参考视频姿态(见「如何新增一个模式」)
 ```
 
-**参考视频已预提取**:`public/references/58_raw.poses.json`(lite 模型 + 中档平滑 +
-2 帧采样,698 帧 / 35 个关键姿态),页面打开秒级载入;替换或新增视频后重新跑
-`npm run precompute` 即可(需要系统装有 Chrome / Chromium / Edge,脚本自动检测)。
+**参考视频已预提取**:`public/references/58_raw.poses.json`(**format 2**:lite 模型 +
+中档平滑 + 2 帧采样,698 帧 / 38 个关键姿态 + 33 条分割剪影轮廓),页面打开秒级载入;
+替换或新增视频后重新跑 `npm run precompute` 即可(需要系统装有 Chrome / Chromium / Edge,脚本自动检测)。
 
 摄像头功能需要 **localhost 或 https** 环境。模型与 wasm 均已本地化:
 
 - `public/wasm/` — MediaPipe vision wasm 运行时
 - `public/models/pose_landmarker_lite.task`(5.8 MB,默认,省性能)
 - `public/models/pose_landmarker_full.task`(9.4 MB,更准)
+- `public/models/selfie_segmenter.tflite`(249 KB,预提取剪影轮廓用)
 
 本地模型缺失时自动回退 MediaPipe 官方 CDN(角标会标注「CDN 模型」)。
 
@@ -40,7 +41,7 @@ npm run precompute           # 离线预提取参考视频姿态(见「如何新
    - **动作教学**:骨架教练演示 3 个基础姿态(拉丁站姿、手臂打开、重心换腿),
      跟做达标(复用打分特征,阈值放宽到 55 分并保持 0.8s)才进入下一步
 3. **模式选择** → 卡片选模式 → 曲目信息(时长/关键动作数/难度)→ 开始
-4. **游戏中**:预告泳道 + 判定弹字(PERFECT/GREAT/GOOD/MISS)+ 连击 + 实时分数 + 进度条 + 部位染色,可暂停/退出(Esc)
+4. **游戏中**:剪影预告泳道(实心人形 pictogram)+ 判定弹字(PERFECT/GREAT/GOOD/MISS)+ 连击 + 实时分数 + 进度条 + 部位染色,可暂停/退出(Esc)
 5. **结算屏**:总分 + 评级(SS/S/A/B/C)+ 星星(1–5)+ 判定统计 + 最大连击 +
    做得最好/最需要练的动作 top3 + 再来一次/返回
 
@@ -79,6 +80,32 @@ npm run precompute           # 离线预提取参考视频姿态(见「如何新
   画布绘制场景(泳道当前卡、骨架教练、自由模式)通过 `cssVar('--accent')`
   读取当前主题色;已去掉随机光斑动效,换成各主题统一、克制的氛围层。
 - 预览截图:`docs/skin-previews/`(title-/modes-/onboarding-stand-/teach- 各张)。
+
+## 预告卡剪影(P-F,骨骼 → 实心人形 pictogram)
+
+对应 P-F 反馈「骨骼看不出动作是什么」。游戏中预告泳道卡、教学分段目录缩略图、
+结算页最好/最差动作快照,全部换成 Just Dance 式**实心人形剪影**(平色填充、
+跟 skin 强调色、当前动作卡高亮)。渲染回退链(都不报错):
+
+1. **姿态胶囊剪影(默认首选)**:`src/lib/silhouette.ts` 的 `bodyToPolygon(body)`
+   把关键帧 22 个身体点光栅化为胶囊体(躯干粗/四肢细 + 头部圆),再走
+   网格→Moore 轮廓追踪→Douglas-Peucker 抽稀→Chaikin 圆化,产出多边形。
+   与打分同源,**四肢永远完整**;归一化自适应(远处的人肩宽估计偏小,
+   单位取 `max(肩宽, 躯干长/1.5)`,按实际 bbox 缩放居中)。
+2. **分割剪影(备胎)**:预提取管线(`npm run precompute`)用 MediaPipe
+   Selfie Segmenter(`public/models/selfie_segmenter.tflite`,249KB,本地 + CDN 兜底)
+   对每个关键姿态帧抠人体轮廓,**用姿态髋部锚点排除镜面反射/背景误检**,
+   轮廓转精简多边形(实测每条 8–56 点)存进 `<视频名>.poses.json`
+   (**format 2**,指纹加 `silhouettes: true`,旧 format 1 仍兼容)。
+   Selfie Segmenter 为近距离自拍训练,对「远距离全身 + 镜面舞房」会丢四肢,
+   所以排在胶囊之后;近距离全身参考视频可直接调渲染优先级。
+3. **旧线框骨架卡**(SkeletonFigure):两者都缺时的最后兜底。
+
+- **缓存补载**:旧 localStorage 缓存 / format 1 JSON 无轮廓字段,加载时先用
+  胶囊/骨架渲染,后台自动 fetch format 2 预计算 JSON 补分割剪影
+  (`loadVideoReference` 的 `onSilhouettes` 回调;结算页用 `loadSilhouettesOnly` 轻量补载)。
+- **体积**:58_raw.poses.json 从 271KB → 282KB(分割剪影 33/38 帧,共 19KB)。
+- 章节模式关键姿态是重定时的,查剪影统一 `t + chapter.start` 换算回全曲时间。
 
 ## 教学模式(Break It Down,先学后考)
 
@@ -156,7 +183,7 @@ npm run precompute           # 离线预提取参考视频姿态(见「如何新
 
    脚本会用系统 Chrome(headless)在浏览器环境里跑与线上一致的 MediaPipe 提取
    (lite 模型 + One Euro Filter 中档 + 每 2 帧采样),为 `public/references/` 下每个视频
-   产出 `<视频名>.poses.json`(姿态序列 + 关键姿态 + 参数指纹)。
+   产出 `<视频名>.poses.json`(format 2:姿态序列 + 关键姿态 + 分割剪影轮廓 + 参数指纹)。
    之后页面打开**秒级载入,不再在浏览器里提取**。
    没跑预提取也没关系:首次打开会自动退回浏览器内实时提取(10–20s)并写 localStorage 缓存。
 
@@ -236,7 +263,7 @@ visibility < 0.5 的点该帧跳过滤波;连续丢失约 12 帧后重现会重�
 ```
 scripts/precompute-references.mjs  # 离线预提取:临时 vite + headless 系统 Chrome 跑 MediaPipe,写 poses.json
 precompute.html                    # 预提取专用页(仅 dev server 用,不进生产构建)
-public/references/58_raw.poses.json # 预计算产物:姿态序列 + 关键姿态 + 参数指纹
+public/references/58_raw.poses.json # 预计算产物(format 2):姿态序列 + 关键姿态 + 剪影轮廓 + 参数指纹
 src/
   game/
     engine.tsx          # 姿态引擎 Provider:摄像头 + 推理循环 + 平滑 + FPS/模型状态
@@ -252,7 +279,8 @@ src/
     types.ts            # 屏幕路由与结算数据类型
   modes/registry.ts     # 模式注册表(新增模式只改这里)
   screens/              # Title / Onboarding / ModeSelect / Teach / Game / Free / Live / Results
-  components/           # SkeletonFigure(小型骨架图示)、StatusBadge(FPS/模型角标)
+  components/           # SilhouetteFigure(剪影 pictogram)/ SkeletonFigure(线框骨架兜底)、StatusBadge(FPS/模型角标)
   lib/                  # 复用 skeleton-live 引擎层(pose/bodyPose/keyPoses/oneEuroFilter/refCache/reference)
+                        # + silhouette(分割剪影 + 姿态胶囊剪影,轮廓追踪/抽稀/圆化)
   precompute.ts         # 预提取页逻辑(与 referenceLoader 兜底提取同参数)
 ```

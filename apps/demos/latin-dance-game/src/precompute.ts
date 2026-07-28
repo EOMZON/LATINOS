@@ -10,6 +10,7 @@ import { bodyVisible, emptyBodyPose, toBodyPose } from './lib/bodyPose'
 import { extractKeyPoses } from './lib/keyPoses'
 import { sequenceToJson, type ReferenceSample, type ReferenceSequence } from './lib/reference'
 import { ASSUMED_FPS, EXTRACT_STEP_FRAMES } from './lib/refCache'
+import { loadImageSegmenter, maskToPolygon, type SilhouettePts } from './lib/silhouette'
 
 declare global {
   interface Window {
@@ -86,8 +87,45 @@ async function runExtraction(videoUrl: string, videoId: string): Promise<unknown
     }
     const keyPoses = extractKeyPoses(seq)
 
+    // ---- 关键姿态剪影(Selfie Segmenter 抠人体轮廓 → 精简多边形) ----
+    // 失败/无人的帧存 null,渲染侧回退骨架卡,不阻断预提取
+    const silhouettes: Array<{ t: number; pts: SilhouettePts } | null> = []
+    try {
+      const segmenter = await loadImageSegmenter()
+      let lastTs = -1
+      for (const k of keyPoses) {
+        let entry: { t: number; pts: SilhouettePts } | null = null
+        try {
+          await seekTo(Math.min(k.t, duration - 0.05))
+          const ts = Math.max(lastTs + 1, Math.round(performance.now()))
+          lastTs = ts
+          // 姿态锚点(髋部中心):多连通域(镜面反射/背景误检)中选出真人
+          let anchor: { x: number; y: number } | undefined
+          const lmRes = landmarker.detectForVideo(v, ts)
+          const lm = lmRes.landmarks?.[0]
+          if (lm?.[23] && lm?.[24]) {
+            anchor = { x: (lm[23].x + lm[24].x) / 2, y: (lm[23].y + lm[24].y) / 2 }
+          }
+          const res = segmenter.segmentForVideo(v, ts)
+          const masks = res.confidenceMasks
+          if (masks && masks.length > 0) {
+            // selfie segmenter 输出 [背景, 人] 两个通道;只有单通道时直接用
+            const mask = masks.length >= 2 ? masks[1] : masks[0]
+            const pts = maskToPolygon(mask.getAsFloat32Array(), mask.width, mask.height, anchor)
+            if (pts) entry = { t: k.t, pts }
+          }
+        } catch {
+          // 单帧分割失败:存 null,渲染回退骨架
+        }
+        silhouettes.push(entry)
+      }
+      segmenter.close()
+    } catch {
+      // 分割模型整体不可用(如 CDN 也不可达):本视频无剪影,不阻断
+    }
+
     return {
-      format: 1,
+      format: 2,
       fingerprint: {
         videoId,
         videoSha256,
@@ -97,16 +135,19 @@ async function runExtraction(videoUrl: string, videoId: string): Promise<unknown
         delegate,
         stepFrames: EXTRACT_STEP_FRAMES,
         assumedFps: ASSUMED_FPS,
+        silhouettes: true,
       },
       meta: {
         duration: seq.duration,
         frames: samples.length,
         okFrames: samples.filter((s) => s.ok).length,
         keyPoseCount: keyPoses.length,
+        silhouetteCount: silhouettes.filter(Boolean).length,
         extractedAt: seq.createdAt,
       },
       seqJson: JSON.parse(sequenceToJson(seq)),
       keyPoses,
+      silhouettes,
     }
   } finally {
     v.pause()

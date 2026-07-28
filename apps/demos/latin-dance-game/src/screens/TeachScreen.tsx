@@ -19,7 +19,9 @@ import {
 } from '../game/drawing'
 import { referenceUrl, type ModeDef } from '../modes/registry'
 import { voice, useVoiceEnabled } from '../game/voice'
+import { findSilhouette, type SilhouetteEntry } from '../lib/silhouette'
 import { buildLessonPlan, segTimeLabel, type LessonSegment } from '../game/lessonPlan'
+import SilhouetteFigure from '../components/SilhouetteFigure'
 import StatusBadge from '../components/StatusBadge'
 
 /**
@@ -71,6 +73,7 @@ export default function TeachScreen({
   const [loadError, setLoadError] = useState<string | null>(null)
   const [refSource, setRefSource] = useState<string | null>(null)
   const [plan, setPlan] = useState<LessonSegment[]>([])
+  const [silhouettes, setSilhouettes] = useState<SilhouetteEntry[] | null>(null)
   const [segIdx, setSegIdx] = useState(0)
   const [stage, setStage] = useState<FollowStage>('slow')
   const [speed, setSpeed] = useState(DEFAULT_SLOW_SPEED)
@@ -185,10 +188,12 @@ export default function TeachScreen({
       smoothLevel: engine.smoothLevel,
       modelType: engine.modelType,
       onProgress: (p) => !cancelled && setLoadPct(p),
+      onSilhouettes: (s) => !cancelled && setSilhouettes(s),
     })
       .then((r) => {
         if (cancelled) return
         setRefSource(r.source)
+        if (r.silhouettes) setSilhouettes(r.silhouettes)
         seqRef.current = r.seq
         keysRef.current = r.keyPoses
         const p = buildLessonPlan(r.seq.duration, r.keyPoses)
@@ -517,21 +522,38 @@ export default function TeachScreen({
               每段先看老师演示两遍,再慢速跟跳、原速跟跳,全部学完连跳一遍就去考试。
             </p>
             <div className="mt-4 flex flex-col gap-2">
-              {plan.map((s) => (
-                <button
-                  key={s.index}
-                  onClick={() => enterDemo(s.index)}
-                  className="sk-card2 sk-hover flex items-center justify-between rounded-2xl px-4 py-3 text-left"
-                >
-                  <span className="font-bold" style={{ color: 'var(--tx)' }}>
-                    {s.title}
-                    <span className="sk-faint ml-2 text-xs font-normal">{segTimeLabel(s)}</span>
-                  </span>
-                  <span className="sk-dim text-xs">
-                    {s.keyPoses.length > 0 ? `${s.keyPoses.length} 个关键动作` : '过渡段'}
-                  </span>
-                </button>
-              ))}
+              {plan.map((s) => {
+                const firstKey = s.keyPoses[0]
+                const silPts = firstKey ? findSilhouette(silhouettes, firstKey.t) : null
+                const firstBody =
+                  !silPts && firstKey ? seqRef.current?.samples[firstKey.index]?.body : undefined
+                return (
+                  <button
+                    key={s.index}
+                    onClick={() => enterDemo(s.index)}
+                    className="sk-card2 sk-hover flex items-center justify-between rounded-2xl px-4 py-3 text-left"
+                  >
+                    <span className="flex items-center gap-3">
+                      {(silPts || firstBody) && (
+                        <SilhouetteFigure
+                          pts={silPts}
+                          body={firstBody}
+                          width={30}
+                          height={40}
+                          color="rgba(255,255,255,0.75)"
+                        />
+                      )}
+                      <span className="font-bold" style={{ color: 'var(--tx)' }}>
+                        {s.title}
+                        <span className="sk-faint ml-2 text-xs font-normal">{segTimeLabel(s)}</span>
+                      </span>
+                    </span>
+                    <span className="sk-dim text-xs">
+                      {s.keyPoses.length > 0 ? `${s.keyPoses.length} 个关键动作` : '过渡段'}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
             <button
               onClick={() => enterDemo(0)}

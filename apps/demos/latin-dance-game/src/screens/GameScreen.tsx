@@ -28,8 +28,9 @@ import {
 import { referenceUrl, splitChapters, type ChapterDef, type ModeDef } from '../modes/registry'
 import { recordChapterResult } from '../game/progress'
 import { cssVar } from '../game/skin'
+import { findSilhouette, type SilhouetteEntry } from '../lib/silhouette'
 import type { GameResult, KeyResult } from '../game/types'
-import SkeletonFigure from '../components/SkeletonFigure'
+import SilhouetteFigure from '../components/SilhouetteFigure'
 import StatusBadge from '../components/StatusBadge'
 
 const KEY_RADIUS = 0.3 // 判定窗口 ±0.3s
@@ -99,6 +100,7 @@ export default function GameScreen({
   const [loadError, setLoadError] = useState<string | null>(null)
   const [popup, setPopup] = useState<{ id: number; judgment: Judgment } | null>(null)
   const [refSource, setRefSource] = useState<'precomputed' | 'cache' | 'extracted' | null>(null)
+  const [silhouettes, setSilhouettes] = useState<SilhouetteEntry[] | null>(null)
   const [hud, setHud] = useState({
     frame: null as number | null,
     combo: 0,
@@ -143,10 +145,12 @@ export default function GameScreen({
       smoothLevel: engine.smoothLevel,
       modelType: engine.modelType,
       onProgress: (p) => !cancelled && setLoadPct(p),
+      onSilhouettes: (s) => !cancelled && setSilhouettes(s),
     })
       .then((r) => {
         if (cancelled) return
         setRefSource(r.source)
+        if (r.silhouettes) setSilhouettes(r.silhouettes)
         chapterCountRef.current = splitChapters(r.seq.duration).length
         fullDurationRef.current = r.seq.duration
         const sliced = chapter ? sliceSequence(r.seq, chapter) : r
@@ -493,6 +497,8 @@ export default function GameScreen({
           {laneKeys.map((k, i) => {
             const sample = seq.samples[k.index]
             const active = i === 0
+            // 章节模式关键姿态是重定时的,查剪影要加回章节起点
+            const silPts = findSilhouette(silhouettes, k.t + (chapter?.start ?? 0))
             return (
               <div
                 key={`${k.t}`}
@@ -501,9 +507,10 @@ export default function GameScreen({
                 }`}
                 style={{ transform: active ? 'scale(1.12)' : `scale(${1 - i * 0.06})` }}
               >
-                {sample?.ok && (
-                  <SkeletonFigure
-                    body={sample.body}
+                {(silPts || sample?.ok) && (
+                  <SilhouetteFigure
+                    pts={silPts}
+                    body={sample?.ok ? sample.body : undefined}
                     width={active ? 66 : 52}
                     height={active ? 88 : 70}
                     color={active ? laneAccent : 'rgba(255,255,255,0.75)'}

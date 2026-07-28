@@ -11,6 +11,7 @@ import {
   saveCachedReference,
 } from '../lib/refCache'
 import { parseSequence, type ReferenceSample, type ReferenceSequence } from '../lib/reference'
+import type { SilhouetteEntry, SilhouettePts } from '../lib/silhouette'
 
 const EXTRACT_DT = EXTRACT_STEP_FRAMES / ASSUMED_FPS
 
@@ -24,6 +25,11 @@ export interface LoadRefOptions {
   smoothLevel: SmoothLevel
   modelType: ModelType
   onProgress?: (progress: number) => void
+  /**
+   * 剪影后台补载回调:命中旧缓存/旧 format 1 预计算(无轮廓数据)时,
+   * 先回退骨架渲染,后台尝试从 format 2 预计算 JSON 补剪影,成功时回调一次。
+   */
+  onSilhouettes?: (silhouettes: SilhouetteEntry[]) => void
 }
 
 export type ReferenceSource = 'precomputed' | 'cache' | 'extracted'
@@ -33,6 +39,8 @@ export interface LoadedReference {
   keyPoses: KeyPose[]
   /** 来源:预计算 JSON / localStorage 缓存 / 浏览器内实时提取 */
   source: ReferenceSource
+  /** 关键姿态剪影(format 2 预计算才有;缺省时渲染回退骨架卡) */
+  silhouettes?: SilhouetteEntry[]
 }
 
 /** 参考视频对应的预计算文件地址:references/58_raw.mp4 → references/58_raw.poses.json */
@@ -51,6 +59,43 @@ interface PrecomputedFile {
   }
   seqJson?: unknown
   keyPoses?: unknown
+  silhouettes?: unknown
+}
+
+/** 校验并解析剪影数组(format 2);不合法返回 undefined(回退骨架渲染) */
+function parseSilhouettes(raw: unknown): SilhouetteEntry[] | undefined {
+  if (!Array.isArray(raw)) return undefined
+  const out: SilhouetteEntry[] = []
+  for (const item of raw) {
+    if (item === null) continue
+    const e = item as { t?: unknown; pts?: unknown }
+    if (typeof e.t !== 'number' || !Array.isArray(e.pts) || e.pts.length < 6) return undefined
+    const pts: SilhouettePts = []
+    let valid = true
+    for (const p of e.pts as unknown[]) {
+      if (!Array.isArray(p) || p.length !== 2 || typeof p[0] !== 'number' || typeof p[1] !== 'number') {
+        valid = false
+        break
+      }
+      pts.push([p[0] as number, p[1] as number])
+    }
+    if (!valid) return undefined
+    out.push({ t: e.t as number, pts })
+  }
+  return out.length > 0 ? out : undefined
+}
+
+/** 轻量剪影补载:只取预计算 JSON 的 silhouettes 字段(结算页 / 后台补载用) */
+export async function loadSilhouettesOnly(sourceId: string): Promise<SilhouetteEntry[] | null> {
+  try {
+    const res = await fetch(precomputedUrl(sourceId))
+    if (!res.ok) return null
+    const raw = (await res.json()) as PrecomputedFile
+    if (raw.format !== 2) return null
+    return parseSilhouettes(raw.silhouettes) ?? null
+  } catch {
+    return null
+  }
 }
 
 /**
@@ -58,22 +103,33 @@ interface PrecomputedFile {
  * ① 预计算 JSON(npm run precompute 产出,秒载;校验参数指纹,不一致才往下走)
  * ② localStorage 缓存(此前浏览器内提取的结果)
  * ③ 浏览器内实时提取(兜底,10–20s,完成后写 localStorage)
+ * 无剪影时(旧缓存 / format 1)先返回、后台补载剪影并经 onSilhouettes 回调。
  */
 export async function loadVideoReference(opts: LoadRefOptions): Promise<LoadedReference> {
+  const withBackfill = (r: LoadedReference): LoadedReference => {
+    if (!r.silhouettes && opts.onSilhouettes) {
+      const cb = opts.onSilhouettes
+      void loadSilhouettesOnly(opts.sourceId).then((s) => {
+        if (s) cb(s)
+      })
+    }
+    return r
+  }
+
   const pre = await tryLoadPrecomputed(opts)
-  if (pre) return pre
+  if (pre) return withBackfill(pre)
 
   const cacheKey = refCacheKey(opts.sourceId, opts.smoothLevel, opts.modelType)
   const cached = loadCachedReference(cacheKey)
-  if (cached) return { ...cached, source: 'cache' }
+  if (cached) return withBackfill({ ...cached, source: 'cache' })
 
   const running = inflight.get(cacheKey)
-  if (running) return running
+  if (running) return running.then(withBackfill)
   const p = doExtract(opts, cacheKey).finally(() => {
     inflight.delete(cacheKey)
   })
   inflight.set(cacheKey, p)
-  return p
+  return p.then(withBackfill)
 }
 
 /** ① 预计算 JSON:文件存在 + 指纹(平滑档/模型/采样步长/视频大小)与当前设置一致才命中 */
@@ -82,7 +138,7 @@ async function tryLoadPrecomputed(opts: LoadRefOptions): Promise<LoadedReference
     const res = await fetch(precomputedUrl(opts.sourceId))
     if (!res.ok) return null
     const raw = (await res.json()) as PrecomputedFile
-    if (raw.format !== 1 || !raw.seqJson || !raw.fingerprint) return null
+    if ((raw.format !== 1 && raw.format !== 2) || !raw.seqJson || !raw.fingerprint) return null
     const fp = raw.fingerprint
     // 参数指纹:提取参数必须与当前设置一致,否则结果不适用
     if (
@@ -114,7 +170,12 @@ async function tryLoadPrecomputed(opts: LoadRefOptions): Promise<LoadedReference
         }))
       }
     }
-    return { seq, keyPoses: keyPoses ?? extractKeyPoses(seq), source: 'precomputed' }
+    return {
+      seq,
+      keyPoses: keyPoses ?? extractKeyPoses(seq),
+      source: 'precomputed',
+      silhouettes: parseSilhouettes(raw.silhouettes),
+    }
   } catch {
     return null
   }
