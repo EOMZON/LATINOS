@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { PoseEngineProvider } from './game/engine'
 import type { Screen } from './game/types'
-import type { ChapterDef, ModeDef } from './modes/registry'
+import { MODES, type ChapterDef, type ModeDef } from './modes/registry'
 import TitleScreen from './screens/TitleScreen'
 import OnboardingScreen from './screens/OnboardingScreen'
 import ModeSelectScreen from './screens/ModeSelectScreen'
 import GameScreen from './screens/GameScreen'
+import TeachScreen from './screens/TeachScreen'
 import FreeScreen from './screens/FreeScreen'
 import LiveScreen from './screens/LiveScreen'
 import ResultsScreen from './screens/ResultsScreen'
@@ -42,6 +43,23 @@ export default function App() {
           onPlay={play}
           onReOnboard={() => setScreen({ name: 'onboarding' })}
           onBack={() => setScreen({ name: 'title' })}
+        />
+      )}
+
+      {screen.name === 'game' && screen.mode.kind === 'teach' && (
+        <TeachScreen
+          key={`${screen.mode.id}:${round}`}
+          mode={screen.mode}
+          onExit={() => setScreen({ name: 'modes' })}
+          onExam={(kind) => {
+            // 去考试:同一参考的打分模式(默认全程跟练)
+            const target =
+              MODES.find(
+                (m) => m.kind === kind && m.referenceId === screen.mode.referenceId && !m.placeholder,
+              ) ?? MODES.find((m) => m.kind === 'follow' && !m.placeholder)
+            if (target) play(target)
+            else setScreen({ name: 'modes' })
+          }}
         />
       )}
 

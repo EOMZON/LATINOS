@@ -5,9 +5,10 @@
 
 export type DanceStyle = '伦巴' | '恰恰' | '桑巴' | '牛仔'
 
-export type PlayKind = 'follow' | 'chapters' | 'challenge' | 'free' | 'live'
+export type PlayKind = 'teach' | 'follow' | 'chapters' | 'challenge' | 'free' | 'live'
 
 export const KIND_LABELS: Record<PlayKind, string> = {
+  teach: '教学',
   follow: '全程跟练',
   chapters: '章节练习',
   challenge: '闯关',
@@ -39,6 +40,16 @@ export function referenceUrl(referenceId: string): string {
 }
 
 export const MODES: ModeDef[] = [
+  {
+    id: 'teach-58',
+    name: '教学模式 · 先学后考',
+    dance: '伦巴',
+    difficulty: 1,
+    kind: 'teach',
+    referenceId: DEFAULT_REF_ID,
+    description:
+      '不知道动作怎么做?先来上课:分段看老师演示,慢速跟跳再原速,全部学完连跳一遍,最后去考试。',
+  },
   {
     id: 'follow-58',
     name: '58 号示范 · 全程跟练',

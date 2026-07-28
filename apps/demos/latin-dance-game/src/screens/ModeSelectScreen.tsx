@@ -11,6 +11,7 @@ import {
   type ModeDef,
 } from '../modes/registry'
 import { SMOOTH_LABELS, SMOOTH_LEVELS } from '../lib/oneEuroFilter'
+import { buildLessonPlan } from '../game/lessonPlan'
 import StatusBadge from '../components/StatusBadge'
 import SkinSwitcher from '../components/SkinSwitcher'
 
@@ -266,6 +267,14 @@ export default function ModeSelectScreen({
                     <span>
                       关键动作 <strong className="sk-accent">{ref.keyPoses.length} 个</strong>
                     </span>
+                    {selected.kind === 'teach' && (
+                      <span>
+                        教学分段{' '}
+                        <strong className="sk-accent">
+                          {buildLessonPlan(ref.seq.duration, ref.keyPoses).length} 段
+                        </strong>
+                      </span>
+                    )}
                     <span className="sk-faint">
                       {ref.source === 'precomputed'
                         ? '参考已就位(预计算)'
@@ -328,9 +337,28 @@ export default function ModeSelectScreen({
                 onClick={() => onPlay(selected)}
                 className="sk-btn mt-6 w-full rounded-full py-3.5 text-lg font-black"
               >
-                {selected.referenceId && !ref ? '备课中,稍等…' : '开始跳舞'}
+                {selected.referenceId && !ref
+                  ? '备课中,稍等…'
+                  : selected.kind === 'teach'
+                    ? '开始上课'
+                    : '开始跳舞'}
               </button>
             )}
+            {/* 打分模式的「先学习」入口:同一参考有教学模式时显示 */}
+            {(selected.kind === 'follow' || selected.kind === 'challenge') &&
+              (() => {
+                const teach = MODES.find(
+                  (m) => m.kind === 'teach' && m.referenceId === selected.referenceId && !m.placeholder,
+                )
+                return teach ? (
+                  <button
+                    onClick={() => setSelected(teach)}
+                    className="sk-ghost mt-2 w-full rounded-full py-2.5 text-sm"
+                  >
+                    还不熟?先上教学模式(分段演示 + 慢速跟跳)→
+                  </button>
+                ) : null
+              })()}
             {selected.kind === 'chapters' && (
               <p className="sk-faint mt-4 text-center text-xs">
                 拿到至少 1 星解锁下一章;

@@ -48,6 +48,7 @@ npm run precompute           # 离线预提取参考视频姿态(见「如何新
 
 | 模式 | 玩法 | 说明 |
 | --- | --- | --- |
+| 教学模式 · 先学后考 | teach | 58 号示范自动分 10 段:真人演示(原速+慢速)→ 慢速跟跳(50–100% 调速)→ 原速 → recap 连跳 → 去考试;全程不打分,可一键跳过(详见「教学模式」一节) |
 | 58 号示范 · 全程跟练 | follow | 伦巴基本步,46.5s 完整跟练,关键动作逐个判定 |
 | 分段章节练习 | chapters | 58 号示范自动切成 9s 一章,逐段练习、逐段给星(3 星制),≥1 星解锁下一章,进度存 localStorage |
 | 闯关模式 | challenge | 每个关键动作是一道关卡,MISS 满 3 次失败重开,结算显示闯过关数 |
@@ -77,7 +78,31 @@ npm run precompute           # 离线预提取参考视频姿态(见「如何新
   (`.sk-scene/.sk-card/.sk-btn/.sk-title/.sk-lane/.sk-fill` 等,见 `index.css`),
   画布绘制场景(泳道当前卡、骨架教练、自由模式)通过 `cssVar('--accent')`
   读取当前主题色;已去掉随机光斑动效,换成各主题统一、克制的氛围层。
-- 预览截图:`docs/skin-previews/`(title-/modes-/onboarding-stand- 各张)。
+- 预览截图:`docs/skin-previews/`(title-/modes-/onboarding-stand-/teach- 各张)。
+
+## 教学模式(Break It Down,先学后考)
+
+对应 P-E 反馈「还不知道动作是什么就要开始训练」。教学模式(kind: `teach`)与打分模式
+完全拆开,流程按 Dance Central「Break It Down」+ STEEZY 范式:
+
+- **自动分段**:纯函数 `src/game/lessonPlan.ts` 的 `buildLessonPlan(duration, keyPoses)`
+  按关键姿态把参考切成若干教学段——每段 1–3 个关键动作、长度 4–8s,段尾留 1.2s 缓冲,
+  首尾相接覆盖全曲,末尾短尾并入上一段;长间隙(无关键动作)按 8s 直切。
+  参数集中在 `LESSON_DEFAULTS` 可调。58 号示范(46.5s / 35 个关键动作)→ 10 段。
+- **每段流程**:
+  1. **演示**:真人参考视频片段(镜面,与主画面一致),原速一遍 + 0.6x 慢速一遍,
+     可「再看一遍」或直接「我学会了,开始跟跳」;
+  2. **慢速跟跳**:默认 65% 速度(🐢/🐇 50%–100% 即时调速),幽灵骨架 + 实时骨骼 +
+     部位染色反馈,**不打分不判定**,经过关键动作时语音报口令
+     (目前是「第 N 个动作,定格住」占位文案,见 lessonPlan.ts 注释,以后接动作词汇表);
+  3. **原速跟跳**:100% 速度,仍不打分;
+  4. 段尾自动推进(或随时点「练好了,原速 →」「下一段 →」手动推进)。
+- **recap**:全部段学完后完整原速连跳一遍(不打分),然后进入完成页
+  「去考试 · 全程跟练 / 闯关模式」。
+- **逃生门**:教学模式所有界面右上角常驻「跳过教学,直接开始打分 →」,
+  熟手不被强制拖时间;全程跟练 / 闯关的详情弹窗也有「先上教学模式」入口。
+- **语音与大字**:复用 voice.ts(开关持久化、important 打断、静默降级)与
+  站位引导同一套 10-foot 大字规范(clamp(40px, 6vw, 64px) 主提示 + 一行小字)。
 
 ## 站位引导(语音 + 大字,远距离可用)
 
@@ -223,9 +248,10 @@ src/
     audio.ts            # WebAudio 合成音效(含 confirm 锁定音)
     voice.ts            # TTS 语音引导(zh voice 优先 / 2s 去重 / important 打断 / 开关持久化)
     standGuide.ts       # 站位判定:STAND_THRESHOLDS + 10 部位映射 + evaluateStand()
+    lessonPlan.ts       # 教学分段纯函数:buildLessonPlan(关键姿态 → 1–3 动作 / 4–8s 教学段)
     types.ts            # 屏幕路由与结算数据类型
   modes/registry.ts     # 模式注册表(新增模式只改这里)
-  screens/              # Title / Onboarding / ModeSelect / Game / Free / Live / Results
+  screens/              # Title / Onboarding / ModeSelect / Teach / Game / Free / Live / Results
   components/           # SkeletonFigure(小型骨架图示)、StatusBadge(FPS/模型角标)
   lib/                  # 复用 skeleton-live 引擎层(pose/bodyPose/keyPoses/oneEuroFilter/refCache/reference)
   precompute.ts         # 预提取页逻辑(与 referenceLoader 兜底提取同参数)
