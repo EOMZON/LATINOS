@@ -12,6 +12,7 @@ import {
 } from '../modes/registry'
 import { SMOOTH_LABELS, SMOOTH_LEVELS } from '../lib/oneEuroFilter'
 import { buildLessonPlan } from '../game/lessonPlan'
+import { getWeightKg, setWeightKg, GOALS, GOAL_META, type FitnessGoal } from '../game/fitness'
 import StatusBadge from '../components/StatusBadge'
 import SkinSwitcher from '../components/SkinSwitcher'
 
@@ -46,7 +47,7 @@ export default function ModeSelectScreen({
   onReOnboard,
   onBack,
 }: {
-  onPlay: (mode: ModeDef, chapter?: ChapterDef) => void
+  onPlay: (mode: ModeDef, chapter?: ChapterDef, goal?: FitnessGoal) => void
   onReOnboard: () => void
   onBack: () => void
 }) {
@@ -57,6 +58,24 @@ export default function ModeSelectScreen({
   const [loadPct, setLoadPct] = useState(0)
   const [loadError, setLoadError] = useState<string | null>(null)
   const loadTokenRef = useRef(0)
+
+  // 拉丁健身:训练目标(持久化) + 体重
+  const GOAL_KEY = 'latin-dance-game:last-goal'
+  const [selectedGoal, setSelectedGoal] = useState<FitnessGoal>(() => {
+    try { const v = localStorage.getItem(GOAL_KEY); if (GOALS.includes(v as FitnessGoal)) return v as FitnessGoal } catch {}
+    return 'burn'
+  })
+  const [weightKg, setWeightKgState] = useState(getWeightKg)
+
+  const changeGoal = (g: FitnessGoal) => {
+    setSelectedGoal(g)
+    try { localStorage.setItem(GOAL_KEY, g) } catch {}
+  }
+  const changeWeight = (delta: number) => {
+    const next = Math.min(300, Math.max(30, Math.round(weightKg + delta)))
+    setWeightKgState(next)
+    setWeightKg(next)
+  }
 
   // 选中模式后预载参考(预计算/缓存秒级),顺便拿到曲目信息
   useEffect(() => {
@@ -299,6 +318,64 @@ export default function ModeSelectScreen({
               </div>
             )}
 
+            {/* 拉丁健身:训练目标 + 体重 */}
+            <div className="mt-4 rounded-2xl bg-white/5 p-4">
+              <p className="mb-2 text-sm font-bold" style={{ color: 'var(--tx)' }}>
+                这次想练什么
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {GOALS.map((g) => {
+                  const meta = GOAL_META[g]
+                  const active = selectedGoal === g
+                  return (
+                    <button
+                      key={g}
+                      onClick={() => changeGoal(g)}
+                      className={`rounded-xl px-2 py-2.5 text-center transition ${
+                        active ? 'sk-chip-active font-bold' : 'sk-chip'
+                      }`}
+                    >
+                      <p className="text-sm font-bold">{meta.label}</p>
+                      <p className="sk-faint mt-0.5 text-[10px] leading-tight">{meta.desc}</p>
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="sk-faint mt-2 text-[11px]">
+                建议 ≥ {GOAL_META[selectedGoal].suggestedMin} 分钟 · 强度约 {GOAL_META[selectedGoal].met} MET ·{' '}
+                {GOAL_META[selectedGoal].desc}
+              </p>
+
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-sm font-bold" style={{ color: 'var(--tx)' }}>
+                  体重
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => changeWeight(-1)}
+                    className="sk-ghost h-8 w-8 rounded-full text-lg font-black"
+                    aria-label="减重"
+                  >
+                    −
+                  </button>
+                  <span className="w-16 text-center text-lg font-black tabular-nums" style={{ color: 'var(--tx)' }}>
+                    {weightKg}
+                    <span className="sk-faint ml-0.5 text-xs font-normal">kg</span>
+                  </span>
+                  <button
+                    onClick={() => changeWeight(1)}
+                    className="sk-ghost h-8 w-8 rounded-full text-lg font-black"
+                    aria-label="增重"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <p className="sk-faint mt-1 text-[11px]">
+                用于估算燃脂量,仅本地保存,可随时调整。
+              </p>
+            </div>
+
             {/* 章节选择 */}
             {selected.kind === 'chapters' && ref && progress && (
               <div className="mt-4 grid grid-cols-3 gap-2">
@@ -309,7 +386,7 @@ export default function ModeSelectScreen({
                     <button
                       key={c.index}
                       disabled={locked}
-                      onClick={() => onPlay(selected, c)}
+                      onClick={() => onPlay(selected, c, selectedGoal)}
                       className={`rounded-2xl p-3 text-center ${
                         locked ? 'sk-card2 opacity-50' : 'sk-card sk-hover'
                       }`}
@@ -334,7 +411,7 @@ export default function ModeSelectScreen({
             {selected.kind !== 'chapters' && (
               <button
                 disabled={!!selected.referenceId && !ref}
-                onClick={() => onPlay(selected)}
+                onClick={() => onPlay(selected, undefined, selectedGoal)}
                 className="sk-btn mt-6 w-full rounded-full py-3.5 text-lg font-black"
               >
                 {selected.referenceId && !ref

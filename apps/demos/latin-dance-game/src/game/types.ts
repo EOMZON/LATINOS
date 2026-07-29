@@ -7,7 +7,7 @@ export type Screen =
   | { name: 'title' }
   | { name: 'onboarding' }
   | { name: 'modes' }
-  | { name: 'game'; mode: ModeDef; chapter?: ChapterDef }
+  | { name: 'game'; mode: ModeDef; chapter?: ChapterDef; goal?: FitnessGoal }
   | { name: 'results'; result: GameResult; mode: ModeDef; chapter?: ChapterDef }
 
 export interface KeyResult {

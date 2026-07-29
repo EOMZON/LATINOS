@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PoseEngineProvider } from './game/engine'
 import type { Screen } from './game/types'
 import { MODES, type ChapterDef, type ModeDef } from './modes/registry'
+import type { FitnessGoal } from './game/fitness'
 import TitleScreen from './screens/TitleScreen'
 import OnboardingScreen from './screens/OnboardingScreen'
 import ModeSelectScreen from './screens/ModeSelectScreen'
@@ -16,9 +17,9 @@ export default function App() {
   // 每次开局 +1,强制 GameScreen 重新挂载(再来一次)
   const [round, setRound] = useState(0)
 
-  const play = (mode: ModeDef, chapter?: ChapterDef) => {
+  const play = (mode: ModeDef, chapter?: ChapterDef, goal?: FitnessGoal) => {
     setRound((r) => r + 1)
-    setScreen({ name: 'game', mode, chapter })
+    setScreen({ name: 'game', mode, chapter, goal })
   }
 
   return (
@@ -79,6 +80,7 @@ export default function App() {
             key={`${screen.mode.id}:${screen.chapter?.index ?? 'all'}:${round}`}
             mode={screen.mode}
             chapter={screen.chapter}
+            goal={screen.goal}
             onFinish={(result) =>
               setScreen({ name: 'results', result, mode: screen.mode, chapter: screen.chapter })
             }
