@@ -9,6 +9,7 @@ import {
 import { usePoseEngine } from '../game/engine'
 import { loadVideoReference } from '../game/referenceLoader'
 import { JUDGMENT_META, judgmentFor, type Judgment } from '../game/judgments'
+import { getSensitivity, sensitivityThresholds } from '../game/sensitivity'
 import {
   drawGhost,
   drawLiveSkeleton,
@@ -135,7 +136,7 @@ export default function LiveScreen({ mode, onExit }: { mode: ModeDef; onExit: ()
           if (judged[ki] || tt <= keys[ki].t + KEY_RADIUS) continue
           judged[ki] = true
           const ks = keyScores[ki]
-          const j = judgmentFor(ks.count > 0 ? ks.sum / ks.count : null)
+          const j = judgmentFor(ks.count > 0 ? ks.sum / ks.count : null, sensitivityThresholds(getSensitivity()))
           if (j === 'miss') comboNow = 0
           else comboNow += 1
           setCombo(comboNow)

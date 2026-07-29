@@ -15,11 +15,35 @@ export const JUDGMENT_META: Record<
 }
 
 /** score 为关键动作窗口内的平均分;null 表示窗口内未入镜 */
-export function judgmentFor(score: number | null): Judgment {
+export type Sensitivity = 'strict' | 'standard' | 'relaxed'
+
+export interface JudgmentThresholds {
+  /** 四档阈值(0–100 分数) */
+  perfect: number
+  great: number
+  good: number
+}
+
+/**
+ * 灵敏度预设：严格提高门槛,宽松降低门槛。
+ * 解决无摄像头环境无法实标阈值的问题——把标定权交还用户,
+ * 用户在本机浏览器跑摄像头即可按手感调难度。
+ */
+export const SENSITIVITY_PRESETS: Record<
+  Sensitivity,
+  { label: string; desc: string; thresholds: JudgmentThresholds }
+> = {
+  strict: { label: '严格', desc: '动作要更准才给高分', thresholds: { perfect: 90, great: 78, good: 60 } },
+  standard: { label: '标准', desc: '默认难度', thresholds: { perfect: 85, great: 70, good: 50 } },
+  relaxed: { label: '宽松', desc: '新手友好,容错更高', thresholds: { perfect: 78, great: 62, good: 42 } },
+}
+
+export function judgmentFor(score: number | null, thresholds?: JudgmentThresholds): Judgment {
+  const t = thresholds ?? SENSITIVITY_PRESETS.standard.thresholds
   if (score === null) return 'miss'
-  if (score >= 85) return 'perfect'
-  if (score >= 70) return 'great'
-  if (score >= 50) return 'good'
+  if (score >= t.perfect) return 'perfect'
+  if (score >= t.great) return 'great'
+  if (score >= t.good) return 'good'
   return 'miss'
 }
 

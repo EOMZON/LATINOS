@@ -22,6 +22,7 @@ import {
   countsCombo,
   judgmentFor,
   type Judgment,
+  type Sensitivity,
 } from '../game/judgments'
 import { sfx } from '../game/audio'
 import {
@@ -48,6 +49,8 @@ import {
   type MuscleActivation,
 } from '../game/muscleMap'
 import { voice } from '../game/voice'
+import { getSensitivity, setSensitivity, sensitivityThresholds } from '../game/sensitivity'
+import SensitivitySwitcher from '../components/SensitivitySwitcher'
 
 const KEY_RADIUS = 0.3 // 判定窗口 ±0.3s
 const SCORE_WINDOW_SEC = 0.5
@@ -149,6 +152,14 @@ export default function GameScreen({
   const [activation, setActivation] = useState<MuscleActivation>(baselineActivation())
   const activationRef = useRef<MuscleActivation>(baselineActivation())
   const prevRefYawRef = useRef<{ t: number; yaw: number } | null>(null)
+  // 判定灵敏度(严格/标准/宽松):标定权交还用户,localStorage 持久化
+  const [sens, setSens] = useState<Sensitivity>(getSensitivity())
+  const sensRef = useRef<Sensitivity>(sens)
+  const handleSens = (s: Sensitivity) => {
+    setSens(s)
+    sensRef.current = s
+    setSensitivity(s)
+  }
 
   phaseRef.current = phase
 
@@ -373,7 +384,7 @@ export default function GameScreen({
         run.judged[ki] = true
         const ks = run.keyScores[ki]
         const avg = ks.count > 0 ? ks.sum / ks.count : null
-        const j = judgmentFor(avg)
+        const j = judgmentFor(avg, sensitivityThresholds(sensRef.current))
         run.judgments[j] += 1
         run.keyResults.push({ t: keys[ki].t, avg, judgment: j })
         if (countsCombo(j)) {
@@ -540,6 +551,7 @@ export default function GameScreen({
             >
               {muscleOn ? '🟥 发力地图' : '○ 发力地图'}
             </button>
+            <SensitivitySwitcher value={sens} onChange={handleSens} />
           </div>
         ) : (
           <div className="w-10" />
