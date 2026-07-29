@@ -51,6 +51,7 @@ import {
 import { voice } from '../game/voice'
 import { getSensitivity, setSensitivity, sensitivityThresholds } from '../game/sensitivity'
 import SensitivitySwitcher from '../components/SensitivitySwitcher'
+import { FitnessTracker, getWeightKg, type FitnessGoal } from '../game/fitness'
 
 const KEY_RADIUS = 0.3 // 判定窗口 ±0.3s
 const SCORE_WINDOW_SEC = 0.5
@@ -104,11 +105,13 @@ function sliceSequence(
 export default function GameScreen({
   mode,
   chapter,
+  goal = 'burn',
   onFinish,
   onExit,
 }: {
   mode: ModeDef
   chapter?: ChapterDef
+  goal?: FitnessGoal
   onFinish: (r: GameResult) => void
   onExit: () => void
 }) {
@@ -128,6 +131,8 @@ export default function GameScreen({
     lowVis: false,
     nextIdx: 0,
     remain: 0,
+    kcal: 0,
+    intensity: 0,
   })
 
   const phaseRef = useRef<Phase>('loading')
@@ -160,6 +165,9 @@ export default function GameScreen({
     sensRef.current = s
     setSensitivity(s)
   }
+  // 拉丁健身:能量/强度/肌肉负荷累加器(读用户体重)
+  const fitnessRef = useRef(new FitnessTracker(getWeightKg()))
+  const lastNowRef = useRef(0)
 
   phaseRef.current = phase
 
@@ -238,6 +246,8 @@ export default function GameScreen({
       chapterStars,
       chapterCount: chapter ? chapterCountRef.current : undefined,
       nextChapter,
+      goal,
+      ...fitnessRef.current.summary(),
     })
   }
 
@@ -334,6 +344,8 @@ export default function GameScreen({
 
       // running
       const t = (now - run.startPerf - run.pausedAccum) / 1000
+      const dt = Math.min(0.1, Math.max(0, (now - lastNowRef.current) / 1000))
+      lastNowRef.current = now
       const progress = Math.min(1, t / run.duration)
       if (t >= run.duration) {
         finishRun(false)
@@ -387,6 +399,7 @@ export default function GameScreen({
         const j = judgmentFor(avg, sensitivityThresholds(sensRef.current))
         run.judgments[j] += 1
         run.keyResults.push({ t: keys[ki].t, avg, judgment: j })
+        if (avg !== null) fitnessRef.current.addMove()
         if (countsCombo(j)) {
           run.combo += 1
           run.maxCombo = Math.max(run.maxCombo, run.combo)
@@ -443,6 +456,9 @@ export default function GameScreen({
         }
       }
 
+      // 拉丁健身:每帧累加能量/强度/肌肉负荷(用实时关节坐标 + 本节目标发力)
+      if (lm) fitnessRef.current.tick(dt, lm, activationRef.current)
+
       // HUD 节流同步
       if (now - lastHudSync > 100) {
         lastHudSync = now
@@ -461,6 +477,8 @@ export default function GameScreen({
           lowVis: run.lowVis,
           nextIdx,
           remain: nextIdx < keys.length ? Math.max(0, keys[nextIdx].t - t) : 0,
+          kcal: fitnessRef.current.snapshotKcal(),
+          intensity: fitnessRef.current.snapshotIntensity(),
         })
         setActivation(activationRef.current)
       }
@@ -522,6 +540,26 @@ export default function GameScreen({
             <span className="rounded-full bg-emerald-500/20 px-3 py-1.5 text-[10px] text-emerald-300 backdrop-blur sm:text-xs">
               参考已就位 ✓
             </span>
+          )}
+          {(phase === 'running' || phase === 'paused') && (
+            <div className="flex flex-col gap-1">
+              <div className="rounded-full bg-black/60 px-3 py-1.5 backdrop-blur">
+                <span className="text-xs">🔥</span>
+                <span className="sk-accent ml-1 text-base font-black tabular-nums">
+                  {Math.round(hud.kcal)}
+                </span>
+                <span className="ml-0.5 text-[10px] text-white/40">kcal</span>
+              </div>
+              <div className="h-1 w-14 overflow-hidden rounded-full bg-white/15">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${Math.min(100, hud.intensity * 100)}%`,
+                    background: 'linear-gradient(90deg,#67e8f9,#2dffc4)',
+                  }}
+                />
+              </div>
+            </div>
           )}
         </div>
         {phase === 'running' || phase === 'paused' ? (

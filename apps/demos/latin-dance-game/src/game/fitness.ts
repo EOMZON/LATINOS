@@ -130,6 +130,15 @@ export class FitnessTracker {
     return this.curIntensity
   }
 
+  /** HUD 节流同步用的轻量快照(不产生 MuscleActivation 对象) */
+  snapshotKcal(): number {
+    return this.kcal
+  }
+
+  snapshotIntensity(): number {
+    return this.curIntensity
+  }
+
   addMove() {
     this.moveCount += 1
   }
