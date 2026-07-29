@@ -271,7 +271,7 @@ export default function ModeSelectScreen({
                       <span>
                         教学分段{' '}
                         <strong className="sk-accent">
-                          {buildLessonPlan(ref.seq.duration, ref.keyPoses).length} 段
+                          {buildLessonPlan(ref.seq, ref.keyPoses).length} 段
                         </strong>
                       </span>
                     )}

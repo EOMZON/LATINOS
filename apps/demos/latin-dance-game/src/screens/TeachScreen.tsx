@@ -196,7 +196,7 @@ export default function TeachScreen({
         if (r.silhouettes) setSilhouettes(r.silhouettes)
         seqRef.current = r.seq
         keysRef.current = r.keyPoses
-        const p = buildLessonPlan(r.seq.duration, r.keyPoses)
+        const p = buildLessonPlan(r.seq, r.keyPoses)
         setPlan(p)
         setPhase('plan')
       })
@@ -304,7 +304,7 @@ export default function TeachScreen({
         partColorsRef.current = neutralPartColors()
       }
 
-      // 慢速跟跳的语音口令:经过关键动作时报一次(占位口令)
+      // 慢速跟跳的语音口令:经过关键动作时报一次(形态驱动专业引导)
       if (ph === 'follow' && stageRef.current === 'slow') {
         const seg = planRef.current[segIdxRef.current]
         if (seg) {
