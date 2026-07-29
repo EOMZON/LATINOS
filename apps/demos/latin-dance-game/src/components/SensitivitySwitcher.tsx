@@ -18,7 +18,7 @@ export default function SensitivitySwitcher({
         <button
           key={s}
           onClick={() => onChange(s)}
-          className={`rounded-full px-2.5 py-1 text-xs font-bold transition-colors ${
+          className={`tap rounded-full px-2.5 py-1 text-xs font-bold transition-colors ${
             value === s ? 'bg-white/25 text-white' : 'text-white/60 hover:bg-white/10'
           }`}
         >

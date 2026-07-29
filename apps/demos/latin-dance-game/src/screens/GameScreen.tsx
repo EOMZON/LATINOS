@@ -534,7 +534,7 @@ export default function GameScreen({
             </div>
             <button
               onClick={togglePause}
-              className="rounded-full bg-black/60 px-4 py-2 text-sm text-white/80 backdrop-blur hover:bg-black/80"
+              className="tap rounded-full bg-black/60 px-4 py-2 text-sm text-white/80 backdrop-blur hover:bg-black/80"
             >
               {phase === 'paused' ? '▶ 继续' : '⏸ 暂停'}
             </button>
@@ -544,7 +544,7 @@ export default function GameScreen({
                 setMuscleOn(v)
                 saveMuscleMapEnabled(v)
               }}
-              className={`rounded-full px-3 py-2 text-xs backdrop-blur ${
+              className={`rounded-full px-3 py-2 text-xs backdrop-blur tap ${
                 muscleOn ? 'sk-ghost' : 'bg-black/60 text-white/80 hover:bg-black/80'
               }`}
               title="肌肉发力地图 · 教学标注"

@@ -341,3 +341,45 @@
 .lane-card {
   animation: lane-slide 0.35s ease-out;
 }
+
+/* 即时按压反馈(apple-design §1: 响应在 pointer-down, 连续反馈而非等释放) */
+.tap {
+  transition: transform 0.08s ease-out;
+  will-change: transform;
+}
+.tap:active {
+  transform: scale(0.96);
+}
+
+/* 尊重 prefers-reduced-motion: 用 opacity 交叉淡入替代位移/弹簧(apple-design §14) */
+@keyframes judgment-pop-reduced {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .judgment-pop {
+    animation: judgment-pop-reduced 0.9s ease-out forwards;
+  }
+  .lane-card {
+    animation: none;
+  }
+  .tap:active,
+  .sk-btn:active {
+    transform: none;
+  }
+  .sk-btn:hover,
+  .sk-hover:hover,
+  .skin-card:hover {
+    transform: none;
+  }
+}
