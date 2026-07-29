@@ -6,12 +6,22 @@ import { sfx } from '../game/audio'
 import { loadSilhouettesOnly } from '../game/referenceLoader'
 import { findSilhouette, type SilhouetteEntry } from '../lib/silhouette'
 import SilhouetteFigure from '../components/SilhouetteFigure'
+import { GOAL_META } from '../game/fitness'
+import { MUSCLE_NAMES, type MuscleId } from '../game/muscleMap'
+import { getPrevSession, recordFitnessCheckin, getStreak } from '../game/fitnessProgress'
 
 function fmtTime(t: number): string {
   return `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`
 }
 
-/** 结算屏:总分 + 评级 + 星星 + 判定统计 + 最大连击 + 最好/最差动作 */
+function fmtDuration(sec: number): string {
+  const s = Math.max(0, Math.round(sec))
+  const m = Math.floor(s / 60)
+  const r = s % 60
+  return m > 0 ? `${m} 分 ${r} 秒` : `${r} 秒`
+}
+
+/** 结算屏:拉丁健身摘要——以🔥燃脂为主指标,动作完成度与肌肉负荷为辅 */
 export default function ResultsScreen({
   result,
   mode,
@@ -30,6 +40,26 @@ export default function ResultsScreen({
   const rating = ratingFor(result.avg)
   const stars = starsFor(result.avg)
   const [silhouettes, setSilhouettes] = useState<SilhouetteEntry[] | null>(null)
+
+  // 健身数据是否可用(仅 GameScreen 跑出的结果带这些字段)
+  const hasFit = result.kcal !== undefined && result.activeSeconds !== undefined
+
+  // 上一次训练趋势:必须在写入今日打卡之前读取
+  const prev = useMemo(() => (hasFit ? getPrevSession() : null), [hasFit])
+
+  // 写入今日打卡并取连续天数(首屏一次性)
+  const [streak] = useState(() => {
+    if (!hasFit) return 0
+    recordFitnessCheckin({
+      kcal: result.kcal ?? 0,
+      activeSeconds: result.activeSeconds ?? 0,
+      avgIntensity: result.avgIntensity ?? 0,
+      goal: result.goal ?? 'burn',
+    })
+    return getStreak()
+  })
+
+  const goalMeta = GOAL_META[result.goal ?? 'burn']
 
   // 最好/最差动作的剪影快照:轻量补载预计算轮廓,没有就保持纯文本(不报错)
   useEffect(() => {
@@ -66,6 +96,19 @@ export default function ResultsScreen({
     return sorted.length > 0 ? sorted : [...best].reverse()
   }, [result, best])
 
+  // 本次肌肉负荷 Top-3(编排标注时间均值)
+  const topMuscles = useMemo(() => {
+    if (!result.muscleLoad) return [] as Array<{ id: MuscleId; v: number }>
+    return (Object.entries(result.muscleLoad) as Array<[MuscleId, number]>)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .filter(([, v]) => v > 0)
+      .map(([id, v]) => ({ id, v }))
+  }, [result])
+
+  const kcal = Math.round(result.kcal ?? 0)
+  const prevKcal = prev ? Math.round(prev.kcal) : 0
+  const deltaKcal = kcal - prevKcal
   const jm = JUDGMENT_META
 
   return (
@@ -76,48 +119,118 @@ export default function ResultsScreen({
         ) : (
           <p className="sk-faint text-sm font-medium tracking-widest">
             {mode.kind === 'chapters' && chapter ? `第 ${chapter.index + 1} 章完成` : '本局完成'}
+            {hasFit ? ` · ${goalMeta.label}` : ''}
           </p>
         )}
 
-        {/* 评级 + 星星(评级色为功能色,不随 skin 变) */}
-        <div
-          className="judgment-pop mt-3 text-8xl font-black italic"
-          style={{
-            color: result.failed ? '#ff4d5e' : RATING_COLORS[rating],
-            textShadow: '0 0 50px var(--glow)',
-          }}
-        >
-          {result.failed ? `${result.clearedCount}/${result.totalCount}` : rating}
+        {/* 主指标:🔥 燃脂估算 */}
+        {hasFit && (
+          <div className="mt-4 flex flex-col items-center">
+            <div
+              className="judgment-pop flex items-end gap-1"
+              style={{ color: '#ff8a3d', textShadow: '0 0 40px rgba(255,138,61,0.45)' }}
+            >
+              <span className="text-4xl leading-none">🔥</span>
+              <span className="text-7xl font-black italic tabular-nums leading-none">{kcal}</span>
+              <span className="sk-faint mb-2 text-xl font-bold">kcal</span>
+            </div>
+            <p className="sk-faint mt-1 text-[11px]">估算值 · 非医学精度 · 体重 {result.weightKg ?? ''}kg 推算</p>
+
+            {/* 本次小结:有效时长 / 动作数 / 平均强度 */}
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm">
+              <span className="sk-dim">
+                有效 <strong className="sk-accent tabular-nums">{fmtDuration(result.activeSeconds ?? 0)}</strong>
+              </span>
+              <span className="sk-dim">
+                <strong className="sk-accent tabular-nums">{result.moveCount ?? 0}</strong> 个动作
+              </span>
+              <span className="sk-dim">
+                强度{' '}
+                <strong className="sk-accent tabular-nums">
+                  {Math.round((result.avgIntensity ?? 0) * 100)}
+                </strong>
+                %
+              </span>
+            </div>
+
+            {/* 比上次 */}
+            {prev && (
+              <p
+                className={`mt-2 rounded-full px-3 py-1 text-xs font-bold ${
+                  deltaKcal >= 0 ? 'sk-chip-active' : 'sk-chip'
+                }`}
+              >
+                {deltaKcal >= 0 ? '↑' : '↓'} 比上次 {deltaKcal >= 0 ? '+' : ''}
+                {deltaKcal} kcal
+                <span className="sk-faint ml-1 font-normal">· 上次 {prevKcal}</span>
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* 今日打卡 */}
+        {hasFit && (
+          <p className="mt-4 rounded-full bg-white/5 px-4 py-1.5 text-xs font-medium" style={{ color: 'var(--tx)' }}>
+            ✅ 今日已打卡 · 连续 <strong className="sk-accent">{streak}</strong> 天
+          </p>
+        )}
+
+        {/* 次级:动作完成度(评级) */}
+        <div className="mt-5 flex items-center gap-3">
+          <div
+            className="text-5xl font-black italic"
+            style={{ color: result.failed ? '#ff4d5e' : RATING_COLORS[rating] }}
+          >
+            {result.failed ? '—' : rating}
+          </div>
+          <div className="text-left">
+            <p className="text-xs font-bold" style={{ color: 'var(--tx)' }}>
+              动作完成度
+            </p>
+            {!result.failed && (
+              <p className="sk-star mt-0.5 text-lg">
+                {'★'.repeat(stars)}
+                <span className="sk-star-off">{'★'.repeat(5 - stars)}</span>
+              </p>
+            )}
+            <p className="sk-dim mt-0.5 text-xs">
+              均分 <strong className="tabular-nums">{Math.round(result.avg)}</strong> · 最大连击{' '}
+              <strong className="sk-accent tabular-nums">{result.maxCombo}</strong>
+            </p>
+          </div>
         </div>
-        {result.failed && <p className="sk-dim mt-1 text-sm">闯过的关数</p>}
-        {!result.failed && (
-          <p className="sk-star mt-2 text-2xl">
-            {'★'.repeat(stars)}
-            <span className="sk-star-off">{'★'.repeat(5 - stars)}</span>
-          </p>
-        )}
-        {mode.kind === 'chapters' && result.chapterStars !== undefined && !result.failed && (
-          <p className="sk-dim mt-1 text-sm">
-            本章得星:{' '}
-            <span className="sk-star">
-              {'★'.repeat(result.chapterStars)}
-              <span className="sk-star-off">{'★'.repeat(3 - result.chapterStars)}</span>
-            </span>
-            {result.chapterStars >= 1 ? ' · 下一章已解锁' : ' · 拿到 1 星才能解锁下一章'}
-          </p>
+
+        {/* 肌肉负荷 Top-3 */}
+        {topMuscles.length > 0 && (
+          <div className="mt-4 w-full rounded-2xl bg-white/5 p-4">
+            <p className="mb-2 text-sm font-bold" style={{ color: 'var(--tx)' }}>
+              这次主要练到
+            </p>
+            <div className="flex flex-col gap-2">
+              {topMuscles.map(({ id, v }) => (
+                <div key={id} className="flex items-center gap-3">
+                  <span className="w-16 shrink-0 text-xs font-medium" style={{ color: 'var(--tx)' }}>
+                    {MUSCLE_NAMES[id]}
+                  </span>
+                  <div className="sk-track h-2 flex-1 overflow-hidden rounded-full">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.round(v * 100)}%`,
+                        background: 'linear-gradient(90deg,#67e8f9,#2dffc4)',
+                      }}
+                    />
+                  </div>
+                  <span className="w-9 text-right text-xs tabular-nums sk-dim">{Math.round(v * 100)}%</span>
+                </div>
+              ))}
+            </div>
+            <p className="sk-faint mt-2 text-[11px]">依据动作编排标注推算,非肌电实测。</p>
+          </div>
         )}
 
-        <p className="sk-dim mt-4 text-sm">
-          全程平均分{' '}
-          <strong className="text-xl tabular-nums" style={{ color: 'var(--tx)' }}>
-            {Math.round(result.avg)}
-          </strong>
-          {' · '}最大连击{' '}
-          <strong className="sk-accent text-xl tabular-nums">{result.maxCombo}</strong>
-        </p>
-
-        {/* 判定统计(功能色标签) */}
-        <div className="mt-5 grid w-full grid-cols-4 gap-2">
+        {/* 判定统计(功能色标签,游戏语境) */}
+        <div className="mt-4 grid w-full grid-cols-4 gap-2">
           {(['perfect', 'great', 'good', 'miss'] as const).map((j) => (
             <div key={j} className="sk-card2 rounded-2xl py-3 text-center">
               <p className="text-xs font-bold" style={{ color: jm[j].color }}>
@@ -130,7 +243,7 @@ export default function ResultsScreen({
           ))}
         </div>
 
-        {/* 最好 / 最需要练 */}
+        {/* 最好 / 最需要练(动作反馈) */}
         {result.keyResults.length > 0 && (
           <div className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="sk-card2 rounded-2xl p-4">

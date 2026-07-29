@@ -45,6 +45,8 @@ export interface GameResult {
   moveCount?: number
   /** 拉丁健身:平均强度 0..1 */
   avgIntensity?: number
+  /** 拉丁健身:估算所用体重(kg) */
+  weightKg?: number
   /** 拉丁健身:本节肌肉负荷(编排标注时间均值) */
   muscleLoad?: MuscleActivation
 }

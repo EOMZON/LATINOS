@@ -80,6 +80,8 @@ export interface FitnessSummary {
   avgIntensity: number
   /** 本节肌肉负荷(时间均值,编排标注) */
   muscleLoad: MuscleActivation
+  /** 估算所用体重(kg) */
+  weightKg: number
 }
 
 /**
@@ -156,6 +158,7 @@ export class FitnessTracker {
       moveCount: this.moveCount,
       avgIntensity: this.itN > 0 ? this.itSum / this.itN : 0,
       muscleLoad,
+      weightKg: this.weightKg,
     }
   }
 }
