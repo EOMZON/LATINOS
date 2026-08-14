@@ -1,0 +1,32 @@
+name: 资料线索
+description: 推荐公开文章、视频、比赛档案、音乐或官方资料
+title: "[Source] "
+labels: ["source", "needs-review"]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: 公开链接
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: 为什么有用？
+      description: 它回答了什么具体动作或练习问题？
+    validations:
+      required: true
+  - type: dropdown
+    id: media
+    attributes:
+      label: 类型
+      options: [官方资料, 公开教学, 比赛档案, 音乐, 文章或研究, 其他]
+    validations:
+      required: true
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: 来源边界
+      options:
+        - label: 这是可公开访问的线索；我没有把付费或私有内容复制进来。
+          required: true

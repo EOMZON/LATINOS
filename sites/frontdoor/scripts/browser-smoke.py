@@ -50,13 +50,30 @@ args = parser.parse_args()
 summary = {"baseUrl": args.base_url, "desktop": [], "mobile": []}
 
 with sync_playwright() as playwright:
-    browser = playwright.chromium.launch(headless=not args.headed)
+    system_chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    launch_options = {"headless": not args.headed}
+    if os.path.exists(system_chrome):
+        launch_options["executable_path"] = system_chrome
+    browser = playwright.chromium.launch(**launch_options)
 
     desktop = browser.new_page(viewport={"width": 1440, "height": 960})
     desktop.goto(args.base_url, wait_until="networkidle")
-    assert_true(text_is_visible(desktop, "TODAY"), "Home page missing TODAY hero marker")
+    assert_true(text_is_visible(desktop, "FORCE"), "Home page missing FORCE hero marker")
+    assert_true(text_is_visible(desktop, "发力实验室"), "Home page missing Force Lab entry")
     assert_true(text_is_visible(desktop, "刚做完的一轮"), "Home page missing next-session rail")
     summary["desktop"].append("home hero visible")
+
+    desktop.goto(f"{args.base_url}/force", wait_until="networkidle")
+    assert_true(desktop.locator(".force-topic").count() == 5, "Force Lab does not render five topics")
+    assert_true(text_is_visible(desktop, "力量经过哪里"), "Force Lab missing force chain guidance")
+    assert_true(text_is_visible(desktop, "常见代偿"), "Force Lab missing compensation guidance")
+    assert_true(text_is_visible(desktop, "待专业复核"), "Force Lab missing review status")
+    assert_true(text_is_visible(desktop, "不是私有课堂原文"), "Force Lab missing public/private boundary")
+    desktop.locator('a[href="#samba-floor-force"]').click()
+    desktop.wait_for_timeout(200)
+    assert_true("#samba-floor-force" in desktop.url, f"Force topic anchor did not update URL: {desktop.url}")
+    assert_no_horizontal_overflow(desktop, "desktop force")
+    summary["desktop"].append("force-first slice renders with five drills and boundaries")
 
     desktop.goto(f"{args.base_url}/dance-os", wait_until="networkidle")
     assert_true(text_is_visible(desktop, "Dance OS Demo"), "Dance OS page missing detail panel title")
@@ -190,6 +207,14 @@ with sync_playwright() as playwright:
 
     home_overflow = assert_no_horizontal_overflow(mobile, "mobile home")
     summary["mobile"].append({"homeOverflow": home_overflow})
+
+    mobile.goto(f"{args.base_url}/force", wait_until="networkidle")
+    assert_true(mobile.locator(".force-topic").count() == 5, "Mobile Force Lab does not render five topics")
+    assert_true(text_is_visible(mobile, "Bounce 来自地板"), "Mobile Force Lab is missing topic content")
+    force_overflow = assert_no_horizontal_overflow(mobile, "mobile force")
+    summary["mobile"].append({"forceOverflow": force_overflow})
+
+    mobile.goto(args.base_url, wait_until="networkidle")
 
     mobile.get_by_role("button", name="展开导航", exact=True).click()
     mobile.wait_for_timeout(200)

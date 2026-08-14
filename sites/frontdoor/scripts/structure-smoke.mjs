@@ -15,15 +15,23 @@ async function fetchHtml(path) {
   return response.text();
 }
 
-const [danceHtml, dailyHtml, homeHtml, legacyHtml, aboutHtml, dashboardHtml, css] = await Promise.all([
+const [danceHtml, dailyHtml, forceHtml, homeHtml, legacyHtml, aboutHtml, dashboardHtml, css] = await Promise.all([
   fetchHtml("/dance-os"),
   fetchHtml("/daily-latin"),
+  fetchHtml("/force"),
   fetchHtml("/"),
   fetchHtml("/legacy"),
   fetchHtml("/about"),
   fetchHtml("/dashboard"),
   readFile(cssPath, "utf8"),
 ]);
+
+assert(forceHtml.includes("FORCE CHAIN"), "Force Lab is missing the force chain blocks");
+assert(forceHtml.includes("常见代偿"), "Force Lab is missing compensation guidance");
+assert(forceHtml.includes("TRY NOW"), "Force Lab is missing actionable drills");
+assert(forceHtml.includes("待专业复核"), "Force Lab is missing review-state disclosure");
+assert(forceHtml.includes("不是私有课堂原文"), "Force Lab is missing the public/private source boundary");
+assert((forceHtml.match(/class="force-topic"/g) || []).length === 5, "Force Lab must render exactly five first-slice topics");
 
 assert(danceHtml.includes('href="#dance-sources"'), "Dance OS is missing the #dance-sources anchor tab");
 assert(danceHtml.includes('id="dance-sources"'), "Dance OS is missing the dance-sources section id");
@@ -53,6 +61,7 @@ assert(homeHtml.includes("TODAY"), "Home page is missing the TODAY hero state");
 assert(homeHtml.includes("连续练习"), "Home page is missing the heatmap section");
 assert(homeHtml.includes("刚做完的一轮"), "Home page is missing the next session rail");
 assert(homeHtml.includes("工作台"), "Home page is missing the core workbench section");
+assert(homeHtml.includes("发力实验室"), "Home page is missing the Force Lab primary entry");
 assert(homeHtml.includes("旧站起步页"), "Home page is missing the legacy module card");
 assert(homeHtml.includes("Dance OS"), "Home page is missing the Dance OS module card");
 assert(dashboardHtml.includes("下一批交付"), "Dashboard is missing the next action section");
@@ -79,6 +88,7 @@ console.log(
         "dance body map practice queue",
         "daily sections",
         "daily loop demo",
+        "force-first knowledge and drill slice",
         "source-backed route sections",
         "home phase hero",
         "home core workbench",

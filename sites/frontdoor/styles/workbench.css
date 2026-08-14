@@ -9,6 +9,128 @@ body{
     radial-gradient(circle at top right, rgba(157,111,224,.06), transparent 26%),
     linear-gradient(180deg, rgba(255,255,255,.01), transparent 18%);
 }
+
+/* Force Lab: the force-first public slice */
+.force-page{display:grid;gap:28px}
+.force-page section{margin-bottom:0}
+.force-hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);
+  gap:18px;
+  margin:0;
+  padding:38px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 82% 12%,rgba(157,111,224,.18),transparent 32%),
+    linear-gradient(145deg,#18171c,#111113 68%);
+  overflow:hidden
+}
+.force-hero-copy h1{
+  max-width:13ch;
+  margin:16px 0 18px;
+  font-size:clamp(34px,5vw,64px);
+  line-height:1.02;
+  letter-spacing:-.05em
+}
+.force-hero-copy p{max-width:56ch;color:var(--muted);font-size:14px;line-height:1.75}
+.force-hero-status{
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:22px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;
+  background:rgba(0,0,0,.2)
+}
+.force-hero-status span,.force-label{font:700 9px/1.2 var(--font-mono),monospace;letter-spacing:.14em;color:var(--violet)}
+.force-hero-status strong{font:400 96px/.9 var(--font-display),sans-serif;margin:22px 0 8px}
+.force-hero-status p{font-size:13px;font-weight:700}
+.force-hero-status small{margin-top:16px;color:var(--muted-2);font-size:10px}
+.force-index{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.force-index a{
+  display:grid;
+  align-content:start;
+  min-height:138px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--surface);
+  transition:transform .15s,border-color .15s
+}
+.force-index a:hover{transform:translateY(-2px);border-color:var(--violet)}
+.force-index span{font:700 10px var(--font-mono),monospace;color:var(--violet)}
+.force-index strong{margin:18px 0 12px;font-size:13px;line-height:1.35}
+.force-index small{margin-top:auto;color:var(--muted-2);font-size:9px}
+.force-topics{display:grid;gap:18px}
+.force-topic{
+  scroll-margin-top:24px;
+  padding:28px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--surface)
+}
+.force-topic-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:24px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.force-number{font-size:72px;line-height:.85;color:var(--violet)}
+.force-dance{margin-top:12px;font-size:9px;color:var(--muted-2)}
+.force-topic-title p{margin-bottom:9px;color:var(--violet);font-size:11px;font-weight:700}
+.force-topic-title h2{font-size:clamp(22px,3vw,36px);line-height:1.12;letter-spacing:-.035em}
+.force-topic-title > div{max-width:66ch;margin-top:12px;color:var(--muted);font-size:12px;line-height:1.65}
+.force-topic-grid{display:grid;grid-template-columns:1.05fr .95fr .95fr;gap:1px;margin-top:22px;background:var(--line);border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.force-block{padding:22px;background:#111113}
+.force-block h3{margin:9px 0 16px;font-size:15px}
+.force-block ul,.force-block ol{display:grid;gap:10px;padding-left:18px;color:var(--muted);font-size:11px;line-height:1.5}
+.force-chain{padding-left:0!important;list-style:none;gap:0!important}
+.force-chain li{display:grid;grid-template-columns:32px 1fr;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.force-chain li:last-child{border-bottom:0}
+.force-chain span{font:400 9px var(--font-mono),monospace;color:var(--violet)}
+.force-chain strong{font-size:11px;color:var(--text)}
+.force-compensations{margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.07)}
+.force-compensations > span{font-size:9px;color:var(--muted-2)}
+.force-compensations > div{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.force-compensations em{padding:4px 7px;border:1px solid rgba(196,67,46,.35);border-radius:999px;color:#dc8f83;font-size:9px;font-style:normal}
+.force-drill{background:var(--violet-deep)}
+.force-source{display:grid;grid-template-columns:1fr auto;gap:4px 10px;margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.force-source span,.force-source strong{font-size:9px}
+.force-source strong{color:#d7bff7}
+.force-source small{grid-column:1/-1;color:var(--muted-2);font-size:8px}
+.force-boundary{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:30px;border:1px solid var(--line);border-radius:16px;background:#111113}
+.force-boundary h2,.force-contribute h2{margin:12px 0;font-size:clamp(22px,3vw,34px);line-height:1.15;letter-spacing:-.035em}
+.force-boundary p{max-width:58ch;color:var(--muted);font-size:11px;line-height:1.65}
+.force-boundary dl{display:grid;border-top:1px solid var(--line)}
+.force-boundary dl > div{display:grid;grid-template-columns:100px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.force-boundary dt{font-size:10px;font-weight:700;color:var(--text)}
+.force-boundary dd{font-size:10px;color:var(--muted)}
+.force-contribute{display:grid;grid-template-columns:.8fr 1.2fr;gap:24px;align-items:end;padding:30px;border-radius:16px;background:var(--text);color:var(--bg)}
+.force-contribute .eyebrow{color:#69676e}
+.force-contribute-routes{display:grid;gap:8px}
+.force-contribute-routes a{display:grid;gap:3px;padding:14px;border:1px solid rgba(0,0,0,.18);border-radius:10px;transition:background .15s}
+.force-contribute-routes a:hover{background:rgba(0,0,0,.06)}
+.force-contribute-routes span{font-size:9px;color:#69676e}
+.force-contribute-routes strong{font-size:11px}
+
+@media (max-width:980px){
+  .force-index{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .force-topic-grid{grid-template-columns:1fr 1fr}
+  .force-drill{grid-column:1/-1}
+}
+
+@media (max-width:860px){
+  .force-page{gap:16px}
+  .force-hero{grid-template-columns:1fr;padding:20px}
+  .force-hero-copy h1{font-size:36px}
+  .force-hero-status{min-height:190px}
+  .force-hero-status strong{font-size:72px}
+  .force-index{grid-template-columns:1fr 1fr}
+  .force-index a{min-height:118px;padding:13px}
+  .force-topic{padding:18px}
+  .force-topic-head{grid-template-columns:1fr;gap:14px}
+  .force-number{font-size:52px}
+  .force-topic-grid{grid-template-columns:1fr}
+  .force-drill{grid-column:auto}
+  .force-boundary,.force-contribute{grid-template-columns:1fr;padding:20px}
+}
 ::selection{background:var(--violet);color:var(--bg)}
 a{color:inherit;text-decoration:none}
 button{font:inherit}

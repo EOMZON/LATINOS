@@ -23,6 +23,19 @@
 - 新内容先在这个仓库里规范化，再决定如何挂到旧域名
 - 这个仓库优先承担“新 frontdoor + 新 demo + 规则中控”
 
+## 当前公开切片：Force Lab
+
+现阶段不从“大而全知识库”继续铺页面，而是先把一个能力闭环做深：
+
+`看懂从哪里发力 → 看见身体链 → 识别常见代偿 → 做一个短练习`
+
+- 页面：`sites/frontdoor/app/force/`
+- 公开内容：`sites/frontdoor/data/force.ts`
+- 私有课堂来源索引：`data/force-source-index.json.local`（被 Git 忽略，不得公开）
+- 贡献规则：[CONTRIBUTING.md](CONTRIBUTING.md)
+
+舞者和老师可以通过 GitHub Issue 投稿，不需要会 Git；开发者可以 fork、建分支并提交 Pull Request。原始课堂转录、老师/学员身份和无权公开的媒体不进入公共仓库。
+
 ## 目录约定
 
 - `AGENTS.md`
@@ -69,3 +82,11 @@
 - 不把飞书里的想法随手落到无结构目录
 - 不继续扩 `Notion` 相关工作流
 - 不把 demo、正式站、归档内容混在同一层
+- 不把私有 Minutes 或课堂原文直接开源
+- 不把教学 cue、个人体感或摄像头推断包装成实时肌电或医学事实
+
+## License
+
+- 代码：MIT，见 [LICENSE](LICENSE)
+- 项目原创公开内容：CC BY 4.0，适用边界见 [CONTENT-LICENSE.md](CONTENT-LICENSE.md)
+- 第三方链接、名称、课堂材料、音频、图片和视频不因被提及而改变原有权利归属

@@ -1,0 +1,59 @@
+name: 动作 / 发力知识
+description: 提交一个动作链、教学提示、常见代偿或练习方法
+title: "[Force] "
+labels: ["content", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        谢谢你参与共创。请区分“看到的动作、教学提示、主观体感和专业事实”，不要粘贴私有课堂转录或无权公开的付费内容。
+  - type: input
+    id: movement
+    attributes:
+      label: 舞种与动作
+      placeholder: 例如：伦巴 Walk / 恰恰锁步
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你想解决什么问题？
+      description: 描述学习者卡点，以及可以观察到的现象。
+    validations:
+      required: true
+  - type: textarea
+    id: chain
+    attributes:
+      label: 发力链或动作顺序
+      placeholder: 脚底 → 主力腿 → 骨盆 → 核心……
+    validations:
+      required: true
+  - type: textarea
+    id: cue
+    attributes:
+      label: 教学提示与主观体感
+      description: 请标明哪些是 cue，哪些只是你的个人体感。
+    validations:
+      required: true
+  - type: textarea
+    id: compensation
+    attributes:
+      label: 常见代偿与安全边界
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: 来源与授权
+      description: 可写公开 URL、书名、教学体系或“个人练习观察”。不要公开私人姓名。
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: 公开确认
+      options:
+        - label: 我没有粘贴私有课堂原文、身份信息或无权公开的媒体。
+          required: true
+        - label: 我理解内容会先进入待复核状态，不会自动成为专业定论。
+          required: true

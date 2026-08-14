@@ -24,7 +24,7 @@ export const homeWorkbench = {
   title: "工作台",
   more: "先回到刚做完的一轮，再进入今天真正要用的模块",
   intro:
-    "先不要把所有东西一起打开。先回到刚做完的一轮，再从旧站、Daily Latin、Dance OS 里选一个真实入口续上今天。独立 Dance OS Demo 已经存在，但首页先负责把入口关系讲清楚。",
+    "先不要把所有东西一起打开。发力实验室是当前第一入口：看懂一个身体链，再进入 Daily Latin 或 Dance OS 把它练出来。",
   entryLabel: "TODAY ENTRY",
   entryTitle: "今天先进入",
   entryMore: "先从能立刻开始的一条真实入口进去。",
@@ -50,24 +50,24 @@ export const homeIndependentDemoBridge = {
 };
 
 export const homeHero: HomeHeroData = {
-  eyebrow: "给成人初学者、重拾者和有卡点的人",
-  title: "先选今天的状态，把这一轮做完。",
-  pill: "2026-07-07 · 今天先选状态，再做一轮",
-  phase: "TODAY",
-  phaseNote: "先做\n1 条入口",
-  tag: "今天先做：恰恰重启 1 轮",
-  description: "先把恰恰的脚下边界做清楚。\n直播回流或拍子卡点，也先回到这一轮。",
+  eyebrow: "给想知道“到底从哪里发力”的拉丁学习者",
+  title: "先看懂身体链，再把一个动作练对。",
+  pill: "FORCE-FIRST · 5 个首发专题",
+  phase: "FORCE",
+  phaseNote: "先看\n1 条链",
+  tag: "发力实验室 · 第一公开切片",
+  description: "脚底、主力腿、骨盆、核心、肩胛。\n把抽象的“发力”变成能观察、能练的下一步。",
   stats: [
-    { label: "今日入口", value: "3" },
-    { label: "真实页面", value: "8" },
-    { label: "回流轨道", value: "3" },
+    { label: "发力专题", value: "5" },
+    { label: "课堂来源", value: "7" },
+    { label: "练习闭环", value: "5" },
   ],
-  progressValue: "3条",
-  progressLabel: "今天入口",
-  sessionLabel: "这一轮先守住",
-  sessionValue: "恰恰脚下边界，不急着加快",
-  ctaHref: "/daily-latin?state=restart&dance=cha#today-loop-demo",
-  ctaLabel: "先去做恰恰这一轮 →",
+  progressValue: "5题",
+  progressLabel: "首发专题",
+  sessionLabel: "这次先回答",
+  sessionValue: "力量从哪里开始，又经过哪里？",
+  ctaHref: "/force",
+  ctaLabel: "进入发力实验室 →",
 };
 
 export const homeQueueFallbacks: HomeQueueFallbackData[] = [
@@ -98,6 +98,16 @@ export const homeQueueFallbacks: HomeQueueFallbackData[] = [
 ];
 
 export const homeModules: InfoCardData[] = [
+  {
+    day: "PRIMARY",
+    title: "发力实验室",
+    href: "/force",
+    rows: [
+      { label: "入口", value: "从哪里发力 / 为什么总是代偿" },
+      { label: "动作", value: "看身体链，再做 60 秒 drill" },
+    ],
+    note: "当前第一产品切片：5 个课堂问题，公开边界与复核状态透明。",
+  },
   {
     day: "MODULE",
     title: "旧站起步页",

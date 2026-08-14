@@ -19,6 +19,7 @@ export const navGroups: NavGroup[] = [
   {
     label: "Library",
     items: [
+      { label: "发力实验室", href: "/force" },
       { label: "Daily Latin", href: "/daily-latin" },
       { label: "Dance OS", href: "/dance-os" },
     ],
@@ -44,6 +45,6 @@ export const siteMeta = {
   mark: "舞",
   name: "拉丁练习入口",
   sub: "PRACTICE LOG · SINCE 2026",
-  liveBadge: "TODAY READY · 8 ROUTES",
-  footer: "先看旧站 / 再进 Daily / 或去 Dance OS",
+  liveBadge: "FORCE LAB · FIRST SLICE",
+  footer: "先看发力 / 再练一轮 / 或去 Dance OS",
 };

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 私密内容或身份信息
+    url: https://github.com/EOMZON/LATINOS
+    about: 不要在公开 Issue 中粘贴课堂原文、私人录音或身份信息；请先联系仓库维护者。

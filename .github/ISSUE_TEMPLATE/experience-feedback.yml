@@ -1,0 +1,23 @@
+name: 体验反馈
+description: 报告看不懂、练不起来、移动端问题或安全担忧
+title: "[Feedback] "
+labels: ["feedback"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 问题类型
+      options: [内容看不懂, 练习无法执行, 可能误导或不安全, 手机或桌面显示问题, 无障碍问题, 其他]
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 发生了什么？
+      description: 请写页面、专题、设备和你原本想完成的动作。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 你希望下一步怎样更清楚？
