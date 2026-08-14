@@ -16,7 +16,7 @@ import {
   sharedDanceDemoFocuses,
   sharedDanceDemoProfiles,
   sharedDanceDemoStates,
-} from "@latinos-data/dance-os-demo-shared";
+} from "./dance-os-demo-shared";
 
 export const danceRows: KeyValue[] = [
   { label: "定位", value: "先把练完后怎么继续做成入口。" },
