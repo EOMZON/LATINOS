@@ -29,7 +29,7 @@ export function Sidebar() {
             {group.items.map((item) => {
               const active = currentPath === normalizePath(item.href);
               return (
-                <Link key={item.href} href={item.href} className={`nav-link${active ? " active" : ""}`}>
+                <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={`nav-link${active ? " active" : ""}`}>
                   <span className="dot" />
                   {item.label}
                 </Link>

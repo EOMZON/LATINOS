@@ -58,10 +58,12 @@ with sync_playwright() as playwright:
 
     desktop = browser.new_page(viewport={"width": 1440, "height": 960})
     desktop.goto(args.base_url, wait_until="networkidle")
-    assert_true(text_is_visible(desktop, "FORCE"), "Home page missing FORCE hero marker")
-    assert_true(text_is_visible(desktop, "发力实验室"), "Home page missing Force Lab entry")
-    assert_true(text_is_visible(desktop, "刚做完的一轮"), "Home page missing next-session rail")
-    summary["desktop"].append("home hero visible")
+    assert_true(text_is_visible(desktop, "THE WHOLE PLAN"), "Home page missing whole-plan marker")
+    assert_true(text_is_visible(desktop, "学习路径"), "Home page missing learning path module")
+    assert_true(text_is_visible(desktop, "成长档案"), "Home page missing growth archive module")
+    assert_true(text_is_visible(desktop, "需求信号"), "Home page missing demand-led priority board")
+    assert_no_horizontal_overflow(desktop, "desktop home")
+    summary["desktop"].append("whole-system home and priority board visible")
 
     desktop.goto(f"{args.base_url}/force", wait_until="networkidle")
     assert_true(desktop.locator(".force-topic").count() == 5, "Force Lab does not render five topics")
@@ -169,29 +171,10 @@ with sync_playwright() as playwright:
     summary["desktop"].append("dashboard dense sections render")
 
     desktop.goto(args.base_url, wait_until="networkidle")
-    assert_true(text_is_visible(desktop, "断练后重启 · 恰恰"), "Home next session queue missing Daily witness evidence")
-    assert_true(text_is_visible(desktop, "伦巴 · 拍子总乱"), "Home next session queue missing Dance witness evidence")
-    desktop.locator('[data-testid="queue-resume-daily"]').click()
-    desktop.wait_for_timeout(250)
-    desktop.wait_for_load_state("networkidle")
-    assert_true("/daily-latin" in desktop.url, f"Queue resume did not reach Daily Latin: {desktop.url}")
-    assert_true("state=restart" in desktop.url and "dance=cha" in desktop.url, f"Daily resume URL missing expected params: {desktop.url}")
-    assert_true(class_contains(desktop, '[data-testid="daily-state-restart"]', "active"), "Daily resume did not activate restart state")
-    assert_true(class_contains(desktop, '[data-testid="daily-dance-cha"]', "active"), "Daily resume did not activate cha dance")
-
-    desktop.goto(args.base_url, wait_until="networkidle")
-    desktop.locator('[data-testid="queue-resume-dance"]').click()
-    desktop.wait_for_timeout(250)
-    desktop.wait_for_load_state("networkidle")
-    assert_true("/dance-os" in desktop.url, f"Archive resume did not reach Dance OS: {desktop.url}")
-    assert_true(
-        "state=beat" in desktop.url and "profile=rumba" in desktop.url and "focus=feet" in desktop.url,
-        f"Dance resume URL missing expected params: {desktop.url}",
-    )
-    assert_true(class_contains(desktop, '[data-testid="dance-state-beat"]', "active"), "Dance resume did not activate beat state")
-    assert_true(class_contains(desktop, '[data-testid="dance-profile-rumba"]', "active"), "Dance resume did not activate rumba profile")
-    assert_true(class_contains(desktop, '[data-testid="dance-focus-feet"]', "active"), "Dance resume did not activate feet focus")
-    summary["desktop"].append("home next session queue updates from archive")
+    assert_true(desktop.locator(".os-node").count() == 6, "Home system map does not render six modules")
+    assert_true(desktop.locator(".priority-row").count() == 5, "Home priority board does not render five demand groups")
+    assert_true(text_is_visible(desktop, "课堂信息在后台供给内容"), "Home content pipeline boundary is missing")
+    summary["desktop"].append("home renders six-module map and demand roadmap")
 
     mobile = browser.new_page(viewport={"width": 390, "height": 844})
     mobile.goto(args.base_url, wait_until="networkidle")

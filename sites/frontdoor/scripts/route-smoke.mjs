@@ -1,7 +1,7 @@
 const baseUrl = process.env.FRONTDOOR_BASE_URL || "http://localhost:3000";
 
 const checks = [
-  { path: "/", title: "先看懂身体链，再把一个动作练对。" },
+  { path: "/", title: "把拉丁学习，做成一张能走进去的地图。" },
   { path: "/force", title: "看懂力量从哪里开始" },
   { path: "/legacy", title: "现有 live 站点，不推倒，先保留" },
   { path: "/daily-latin", title: "把今天这一轮压成最小入口" },

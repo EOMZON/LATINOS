@@ -57,13 +57,15 @@ assert(dailyHtml.includes("旧站已验证的起步原则"), "Daily Latin is mis
 assert(dailyHtml.includes("本页依据"), "Daily Latin is missing the source-backed evidence section");
 assert(dailyHtml.includes("Daily Latin 动作库"), "Daily Latin is missing the interactive move library section");
 
-assert(homeHtml.includes("TODAY"), "Home page is missing the TODAY hero state");
-assert(homeHtml.includes("连续练习"), "Home page is missing the heatmap section");
-assert(homeHtml.includes("刚做完的一轮"), "Home page is missing the next session rail");
-assert(homeHtml.includes("工作台"), "Home page is missing the core workbench section");
-assert(homeHtml.includes("发力实验室"), "Home page is missing the Force Lab primary entry");
-assert(homeHtml.includes("旧站起步页"), "Home page is missing the legacy module card");
-assert(homeHtml.includes("Dance OS"), "Home page is missing the Dance OS module card");
+assert(homeHtml.includes("THE WHOLE PLAN"), "Home page is missing the whole-system plan");
+assert(homeHtml.includes("学习路径"), "Home page is missing the learning path module");
+assert(homeHtml.includes("拉丁知识库"), "Home page is missing the knowledge module");
+assert(homeHtml.includes("身体系统"), "Home page is missing the body system module");
+assert(homeHtml.includes("动作实验室"), "Home page is missing the action lab module");
+assert(homeHtml.includes("资料库"), "Home page is missing the resource library module");
+assert(homeHtml.includes("成长档案"), "Home page is missing the growth archive module");
+assert(homeHtml.includes("需求信号"), "Home page is missing the demand-led priority explanation");
+assert(homeHtml.includes("课堂信息在后台"), "Home page is missing the public/private content pipeline boundary");
 assert(dashboardHtml.includes("下一批交付"), "Dashboard is missing the next action section");
 assert(dashboardHtml.includes("决策护栏"), "Dashboard is missing the guardrail section");
 assert(dashboardHtml.includes("Proof / Risk / Gate"), "Dashboard is missing the proof-risk-gate section");

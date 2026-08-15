@@ -45,6 +45,6 @@ export const siteMeta = {
   mark: "舞",
   name: "拉丁练习入口",
   sub: "PRACTICE LOG · SINCE 2026",
-  liveBadge: "FORCE LAB · FIRST SLICE",
-  footer: "先看发力 / 再练一轮 / 或去 Dance OS",
+  liveBadge: "LATIN DANCE OS · BUILDING",
+  footer: "完整架构 / 需求排序 / 开源共创",
 };
