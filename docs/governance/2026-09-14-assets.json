@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-14",
+  "sourceHead": "d533f28808962b7dcb6da2195e34e1603fedf033",
+  "repo": "LATINOS",
+  "assets": [],
+  "recovery": "git checkout <verified-ref>; git lfs pull where .gitattributes selects LFS; verify each payload against sha256. Original runtime paths retained."
+}

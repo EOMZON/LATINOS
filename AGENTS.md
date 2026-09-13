@@ -6,19 +6,11 @@
 
 ## Session Startup
 
-进入本目录后，默认按这个顺序读：
-
-1. `README.md`
-2. `MEMORY.md`
-3. `memory/` 里今天最新的日志
-4. `docs/standards/source-of-truth.md`
-5. `docs/standards/repo-structure.md`
-6. `docs/standards/website-strategy.md`
-7. `data/feishu/latinos-sources.json`
-
-如果当前任务和网页、demo、域名、旧站承接有关，再额外看：
-
-8. `docs/legacy/latindance-map.md`
+- 普通开发或 Git 治理先读 `README.md`，按目标路径加载适用合同；已读且未变化的内容可复用。
+- 内容源、课堂材料或飞书映射：读 `docs/standards/source-of-truth.md` 和 `data/feishu/latinos-sources.json`。私有课堂原文、身份和未授权媒体不得进入公共仓库。
+- 新文件归属或目录调整：读 `docs/standards/repo-structure.md`。
+- 网页、demo、域名或旧站承接：读 `docs/standards/website-strategy.md` 和 `docs/legacy/latindance-map.md`；沿用下方生产域名保护。
+- 明确恢复项目长期上下文时，再读 `MEMORY.md` 和相关日期的 `memory/`；普通审计不默认加载日记。
 
 ## 这条线真正要做什么
 

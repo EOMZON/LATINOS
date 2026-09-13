@@ -3,3 +3,6 @@ dist/
 .DS_Store
 *.local
 .env
+
+# Explicitly preserved governance assets; generated dependencies stay ignored.
+/sites/frontdoor/tsconfig.tsbuildinfo
