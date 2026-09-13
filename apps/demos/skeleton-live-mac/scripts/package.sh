@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONTENT_ROOT="/Users/zon/Desktop/LATINOS/apps/demos/skeleton-live"
+CONTENT_ROOT="${CONTENT_ROOT:-$(cd "$ROOT/../skeleton-live" && pwd)}"
 APP_NAME="Skeleton Live"
 BUNDLE_ID="local.skeletonlive.mac"
 DISPLAY_NAME="Skeleton Live"
