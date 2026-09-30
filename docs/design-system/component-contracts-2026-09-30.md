@@ -9,7 +9,7 @@
 - 本文件是**接口文档**，不是实现。所有 runtime 实现（raster 资产、`data/visual-asset-ledger.json`、`lib/body-force/**`、共享组件/页面）归 **G-latindance-3 single-writer**；本文件只定义"实现必须满足什么"。
 - 每个组件 contract = 数据输入 ＋ 视觉规则 ＋ 验收门。验收门不通过，实现打回。
 - 需本机验证的项标。
-- SEO 字段槽位为 provisional：G-latindance-1 的 SEO 合同落地后对一遍，有差即调。
+- SEO 字段已对齐 G-latindance-1 `seo-metadata-fields` v0.1（2026-09-30，直核原文）；其合同仍为草案，若变更，此处跟随调整。
 
 ## 1. 通用验收门（DNA §6 七问转门）
 
@@ -61,11 +61,15 @@ pose_asset_id: string # 该舞种 signature pose 资产 id
 ribbon_geometry: { length, wave, emphasis} # 该舞种 ribbon 参数（见下表）
 timing_note: string # timing character（一句话）
 links: [{ label, href}] # 入门 / 进阶 / 相关 daily / blog
-seo: # 槽位（provisional，待 G-1 SEO 合同确认）
-title_template: string
-meta_description: string
-og_image: string
-canonical: string
+seo:  # 已对齐 G-latindance-1 seo-metadata-fields v0.1（2026-09-30，直核原文）
+  title: string            # 必填，模板「{页面名}｜LatinDance 拉丁舞」，≤30 中文字符
+  meta_description: string # 必填，中文一句话价值说明，≤80 字，不堆关键词
+  canonical: string        # 必填，绝对 URL（apex canonical；不带尾 slash；path 全小写）
+  robots: string           # 必填，默认 index,follow
+  og: { title, description, url, type, image_1200x630, locale_zh_CN, site_name_LatinDance }
+  twitter_card: { card: summary_large_image, title, description, image }
+  theme_color: "#FBF8F1"  # G-2 决策：浏览器 chrome 色取 ivory，禁紫
+  json_ld: object         # hub 页按需 ItemList / Article（首页为 Organization + WebSite）
 ```
 
 **五舞种 character ＋ ribbon 参数**（继承 DNA §4、prompt guideline §4–§8）：
