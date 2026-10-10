@@ -52,6 +52,22 @@
 - 等新 frontdoor 足够稳，再考虑是否接到旧域名首页
 - 旧站内容保留成 `legacy` 或 `v1` 入口
 
+## 当前状态（2026-10-11 实测审计）
+
+canonical 计划仍是 2026-09-30 口径：`docs/2026-09-30-latindance-top-public-web-architecture.md` + `product-hub#193`。
+`latindance.top` = LATINOS Public Web（品牌/SEO/内容，主域 subdirectory）；`learn.latindance.top` = latinDance Learning Runtime；旧域做 old→new 301 后释放。
+
+但实测发现执行层停摆 + 一处生产事故（详见 `docs/analysis/2026-10-11-latin-dance-os-progress-audit.md`）：
+
+- `latindance.top` / `www` TLS 证书 2026-07-27 已过期，浏览器硬拦截
+- apex 301 方向与设计相反（现在 new→old，应为 old→new）
+- 线上跑的是 `latinDance` main 的「Roya拉丁舞 · Start Small」，本仓 frontdoor 未部署到任何 latindance.top 域
+- 五舞种 topic hub（/rumba 等）全 404；`learn.latindance.top` 无 DNS/TLS
+- LATINOS main 停在 `d3f2859`（09-30），PR #2 设计系统 DRAFT 11 天未合
+
+**未来 agent 必读**：动手前先跑 `openssl s_client -connect latindance.top:443 -servername latindance.top | openssl x509 -noout -dates`
+与 `curl -I https://latindance.top/`（不加 `-k`）确认线上状态，不要在"新站已上线"的错误假设上推进。
+
 ## 需要未来 agent 持续记住的事
 
 - 用户不想再看到混乱目录
